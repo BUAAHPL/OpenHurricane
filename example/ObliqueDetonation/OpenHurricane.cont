@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+*****************************************************************************************
+||  Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation.     ||
+||     - OpenHurricane CFD program.                                                    ||
+||	   Controller file .														   ||
+||     Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.             ||
+*****************************************************************************************
+-->
+<Config>
+	<!--【0】 Grid Setting-->
+	<meshSet>
+		<!--【0.1】 Mesh Source-->
+		<meshFile>fluent.msh</meshFile>		<!-- fluent format : .msh; Hurricane format : .h5-->
+		<meshFormat>fluent</meshFormat>		<!-- fluent, CGNS, PLOT3D or Hurricane-->
+		<unit>m</unit>
+		<reordering>RCMReordering</reordering>		<!-- MetisReordering or RCMReordering -->
+
+		
+		
+		
+		<!--【0.2】 Scale Mesh-->
+		<scaleMesh>(0.5,0.5,0.01)</scaleMesh>
+
+	</meshSet>
+
+	<!--【1】 Iteration Setting-->
+	<iteration>
+		<!--【1.1】 Step&Write setting-->
+		<maxStep>5000</maxStep>
+		<totalStep>0</totalStep>
+		<writeOutputStep>500</writeOutputStep>
+		<restartFrom>result\Hurricane-10500.h5</restartFrom>
+
+		<!--【1.2】 Time dependence-->
+		<flowState>steady</flowState>
+		
+		<pseudoTime>
+			<timeStepMethod>cellBasedMethod</timeStepMethod>
+			<!-- faceBasedMethod or cellBasedMethod -->
+			<CFLSetting>
+				<cflMin>10</cflMin>
+				<!-- The minimum CFL number. Default is 0.1 . -->
+				<cflMax>200</cflMax>
+				<!-- The maximum CFL number. Default is 10.0 . -->
+				<!-- CFL number-->
+				<stepForPrintCFL>100</stepForPrintCFL>
+
+				<!-- (1) linearCFL -->
+				<CFLType>linearCFL</CFLType>
+				<!-- The CFL type for adapting CFL number. Can be: linearCFL, expCFL or expertSystemAdaptCFL. If not specified, the linearCFL will be used. -->
+				<linearCFL>
+					<cflConst>150</cflConst>
+					<cflLinear>300</cflLinear>
+				</linearCFL>
+
+
+			</CFLSetting>
+			<!-- Time Scheme-->
+			<timeStepType>localTimeStep</timeStepType>
+			<!-- localTimeStep or globalTimeStep, the default value is localTimeStep-->
+			<CForTimeStep>1.0</CForTimeStep>
+			<!-- Range [1,4]-->
+
+			<!-- Convergence Acceleration for Stretched Meshes-->
+			<isStretchAc>off</isStretchAc>
+			<!-- Notice : Only works in implicit time scheme. Default is on. -->
+			<StretchAc>
+				<minStretchScale>1.0</minStretchScale>
+				<cflRatioMax>500.0</cflRatioMax>
+			</StretchAc>
+
+			<minCellOrthogonality>0.7</minCellOrthogonality>
+			<!-- The maximum cell orthogonality for correct the time step. Default is 0.7. -->
+		</pseudoTime>
+
+		<timeMethod>
+			<!-- (1) LUSGS. Implicit scheme. -->
+			<timeMarching>LUSGS</timeMarching>
+			<!-- For unsteady flow:	<timeMarching>unsteadyLUSGS</timeMarching> -->
+			<LUSGS>
+				<omegaForLUSGS>1.10</omegaForLUSGS>
+				<!-- Range [1,2]-->
+				<betaT>0.2</betaT>
+			</LUSGS>
+			
+			<sourceTermTreating>diagImpliciSource</sourceTermTreating>
+			<!-- explicitSource, diagImpliciSource or fullJacobian. Default is explicitSource. -->
+		</timeMethod>
+
+		<monitor>
+			<monitorList><![CDATA[residuals]]></monitorList>
+			<!--【1.6】 Residuals Write Setting-->
+			<residuals>
+				<monitorType>residuals</monitorType>
+				<updateStep>1</updateStep>
+				<writeToFile>off</writeToFile>
+				<!-- On or off. Should write the information to the file. Default is off. -->
+				<fileName>HurricaneResidual.dat</fileName>
+				<!-- Defalut is case name + "_residuals.dat".  -->
+				<varList><![CDATA[rho,v,E,kt,wt]]></varList>
+				<!-- Notice: if vector-type variables, the vector name is only valid while the name of every component of this vecotr is not essential-->
+				<residualConvergence>off</residualConvergence>
+				<!-- On or off, default is off. -->
+				<rho>1e-6</rho>
+				<v>(1e-6,1e-6,1e-6)</v>
+				<!-- Notice: if vector-type variables-->
+				<E>1e-6</E>
+				<kt>1e-6</kt>
+				<wt>1e-6</wt>
+			</residuals>
+			
+		</monitor>
+	
+	</iteration>
+
+
+	<!--【2】 Spatial Scheme-->
+	<spatialScheme>
+		<!--【2.1】 Flux-->
+		<spatialScheme>upwindSchemes</spatialScheme>
+		<!-- upwindSchemes, blendingScheme,blendingSchemeTVDLimiter,blendingSchemeTVDLimiter2, JST, KNP or KT-->
+		
+		<upwindSchemes>
+			<upwindScheme>HLLC_HLL</upwindScheme>			<!--AUSMPWPlus, AUSMPlusUP, LDFSS2, HLLC, HLLC_HLL, AUSM, HLL, or vanLeer-->
+
+			<AUSMPlusUP>				<!--AUSMPlusUP scheme parameters>-->
+				<Kp>0.25</Kp>
+				<Ku>0.75</Ku>
+				<sigma>1.0</sigma>
+				<beta>0.125</beta>
+			</AUSMPlusUP>
+		</upwindSchemes>
+
+
+		<isLowMachCorrection>off</isLowMachCorrection>
+		<!-- Is using low Mach number correction in spatial scheme. Default is off. -->
+
+
+		<reconstruction>linear</reconstruction>
+		<limitersForLinear>Venk</limitersForLinear>
+		<K>0.010</K>
+		
+		<!--【2.3】 Gradient-->
+		<gradient>cellGaussGrad</gradient>
+		<!-- nodeGaussGrad, leastSquareGrad or cellGaussGrad-->
+		<!--<weightType>WLSQG</weightType>-->
+		<!-- Least Square Gradent Weight Type : WLSQ0, WLSQ1, WLSQ2, WLSQ3, WLSQG-->
+		<cellNeighbourCell>FACENEIGHBOUR</cellNeighbourCell>
+		<!-- FACENEIGHBOUR, NODENEIGHBOUR or TWOFACENEIGHBOUR-->
+	</spatialScheme>
+
+	<!--【3】 Flow Setting-->
+	<flow>
+
+		<!--【3.1】 Flow Model-->
+		<flowModel>EulerFlow</flowModel>
+		<!-- EulerFlow, laminarFlow or eddyViscosity-->
+		<Prl>0.72</Prl>
+		<!-- Laminar Prandtl number-->
+
+		<!--【3.2】 Turbulence Setting-->
+		<Prt>0.90</Prt>
+		<!-- Turbulent Prandtl number-->
+		<Sct>0.5</Sct>
+		<!-- Turbulent Schmidt number-->
+		
+
+		<!--【3.3】 Limits Setting-->
+		<limits>
+			<limitMethod>directly</limitMethod>
+			<!-- directly or average-->
+			<!--Temperature-->
+			<THigh>5000.0</THigh>
+			<TLow>100.0</TLow>
+			<!--Pressure-->
+			<pHigh>6930000</pHigh>
+			<pLow>1.0</pLow>
+			<!--Eddy Viscousity-->
+			<mutHigh>2.0e5</mutHigh>
+			<mutLow>1.0e-15</mutLow>
+
+			<minKt>1e-14</minKt>
+			<!-- default is 1e-14 -->
+			<minWt>1e-20</minWt>
+			<!-- default is 1e-20 -->
+		</limits>
+
+		<!--【3.4】 Species Setting-->
+		<mixture>
+			<equationOfState>perfectGas</equationOfState>
+			<chemical>reaction</chemical>			<!--singleSp, mixing or reaction-->
+			
+			<maxSubStep>3</maxSubStep>
+			<!-- The maximum sub-steps for operator-splitting. Default is 3. -->
+			<thermo>
+				
+				<!-- (3) JANAF. -->
+				 <type>JANAF</type>
+
+			</thermo>
+			<transport>
+				
+				<!-- (3) Kinetic theory. -->
+				<type>kinetic</type>
+
+				
+			</transport>
+			<mixtureFiles>
+				<chemFile>mech\in_mechanism.che</chemFile>
+				<thermoFile>mech\thermo7.dat</thermoFile>
+				<tansportFile>mech\transport.dat</tansportFile>
+			</mixtureFiles>
+
+			<reactions>
+				<chemistryOption>coupled</chemistryOption>				
+				<!-- Chemistry options include coupled, strangSplitted and integrated. Defalut is coupled. 
+				(1) Option "coupled" is valid for laminar finite rate, PaSR and EDC as well as ED model.
+				(2) Option "strangSplitted" is only valid for laminar finite rate.
+				(3) Option "integrated" is valid for laminar finite rate, PaSR and EDC model.
+				-->
+				<combustionModel>
+					<!--Turbulent combustion closure models:  finiteRate, eddyDissipation , PaSR or EDC-->
+					<!-- (1) Laminar finite rate. -->
+					<type>finiteRate</type>
+					<finiteRate>
+						<instantaneousReactionRate>on</instantaneousReactionRate>
+						<!-- For finiteRate and PaSR, to use instantaneous reaction rate (on) or integrated reaction rate (off). Default is on. -->
+						<minDtFactor>0.1</minDtFactor>
+						<!-- The minimum factor to reduce the time step. Default is 0.1. -->
+					</finiteRate>
+					
+				</combustionModel>
+				
+				<chemistrySource>
+					<solver>
+						<ODEsSolver>RK23</ODEsSolver>						<!--Euler, RK23, RKF45 or SIEuler, ImplicitEuler, CVODESolver-->
+						<maxstep>10000</maxstep>						<!-- Default is 10000 -->
+						<atol>1e-9</atol>						<!-- Absolute tolerance. Default is 1e-15 -->
+						<rtol>1e-3</rtol>						<!-- Relative tolerance. Default is 1e-4 -->
+						<safescale>0.8</safescale>
+						<minscale>0.25</minscale>
+						<alphainc>0.25</alphainc>
+						<maxScale>10.0</maxScale>
+						<ImplicitEuler>
+							<autoUpdateJacobian>on</autoUpdateJacobian>							<!-- on or off. Default is off. -->
+							<stepToUpdateJac>4</stepToUpdateJac> <!-- If autoUpdateJacobian is on, then set step to update Jacobian matrix. Default is 4. -->
+							<limitIncrement>off</limitIncrement> <!-- Limit the increment. Default is off. -->
+							<ATolIncrement>1e-8</ATolIncrement>							<!-- Default is 1e-8. -->
+							<RTolIncrement>0.1</RTolIncrement>  <!-- Default is 0.1. -->
+						</ImplicitEuler>
+					</solver>
+					<chemistrySource>chemistryODEs</chemistrySource>
+					<!--
+					  chemistryODEs, chemistryNoSolver, chemistryMTS, chemistryHMTS, 
+					  DACTODEs, CDACTODEs, DACTNoSolver or CDACTNoSolver,simplifiedChemistryNoSolver,
+					  CUDAChemistrySourceNoSolver,simplifiedSourceMTS,simplifiedChemistryODEs
+					-->
+					
+					<chemicalMaxStep>1e10</chemicalMaxStep>					<!-- The maximum step for integrating chemical kinetics. -->
+					<simplifiedJacobians>on</simplifiedJacobians>
+
+					<solveOptions>
+						<TemperatureThreshold>200</TemperatureThreshold>	<!-- The minimum temperature for computing chemical reactions. Only works for "strangSplitted" and "integrated". Default is 200K. -->
+						<TemperatureAlpha>0.1</TemperatureAlpha>						<!-- Temperature positivity limit rate. Default is 0.2. -->
+						<TemperatureBeta>0.15</TemperatureBeta>    <!-- Temperature time step reduction. Default is 0.25. -->
+					</solveOptions>
+					
+
+
+
+					
+					
+				</chemistrySource>
+			</reactions>
+		</mixture>
+	</flow>
+
+
+	<!--【4】 Boundary Condition-->
+	<boundaryCondition>
+
+		<!--【4.1】 pressure-far-field or supersonic inlet boundary condition. -->
+		<INLET>
+			<!-- Boundary type -->
+			<bcType>pressureFarField</bcType>
+			<!-- pressureFarField (pressure-far-field is ok) or supersonicInlet or velocityInlet (velocity-inlet is ok). -->
+			<!-- Momentum -->
+			<momentumGivenBy>pressureAndVMag</momentumGivenBy>
+			<!-- pressureAndMach, pressureAndVMag, ReynoldAndMach or ReynoldAndVMag. Default is pressureAndMach. -->
+			<p>42500.0</p>
+			<!-- <ma>2.9</ma> -->
+			<!-- <momentumGivenBy>pressureAndVMag</momentumGivenBy> -->
+			<!-- Velocity magnitude. -->
+			<!-- <p>101325.0</p> -->
+			<v>2473.4</v>
+			<directionType>directionVector</directionType>
+			<!-- directionVector, normalToBoundary or angle. -->
+			<direction>car(0.9455186,-0.325568,0)</direction>   <!-- wedge angle 19° -->
+
+			<!-- Thermal -->
+			<T>851.5</T>
+			<species>
+				<givenBy>moleFraction</givenBy>
+				<!-- massFraction or moleFraction. Default is massFraction. -->
+				<H2>0.295858</H2>
+				<O2>0.147929</O2>
+				<N2>0.556213</N2>
+			</species>
+		</INLET>
+
+	
+
+		<!--【4.4】 pressure outlet -->
+		<OUTLET>
+			<bcType>outflow</bcType>
+			<p>42500.0</p>
+		</OUTLET>
+
+		
+		<!--【4.6】 Wall -->
+		<WALL>
+			<!--【A】 Basic Condition -->
+			<bcType>wall</bcType>
+			
+			<momentum>
+				<shearCondition>noSlip</shearCondition><!-- noSlip, invSlip or rareSlip-->	
+			</momentum>
+			
+			<thermal>
+				<thermalCondition>adiabatic</thermalCondition>	
+			</thermal>
+
+		</WALL>
+
+		<!--【4.7】 Symmetry -->
+		<SYM>
+			<bcType>symmetry</bcType>
+		</SYM>
+		
+	</boundaryCondition>
+
+	<!--【5】 Reference Value-->
+	<ref>
+		
+		<length>1.0</length>
+		<!-- The reference length [m], which is used to compute the moment coefficient. Default is 1. -->
+		<area>1</area>
+		<!-- The reference area, which is used to compute the force and the moment coefficients. [m^2]. Default is 1. -->
+		<density>1.225</density>
+		<!-- The reference density. [kg/m^3] -->
+		<enthalpy>0.0</enthalpy>
+		<pressure>42500.0</pressure>
+		<temperature>872</temperature>
+		<velocity>1</velocity>
+		<viscosity>1.7894e-5</viscosity>
+		<specificHeatRatio>1.4</specificHeatRatio>
+		<gasConstantNumber>287.06</gasConstantNumber>
+	</ref>
+
+	
+
+	<!--【6】 Initialization-->
+	<initialization>
+
+		<initFromBoundary>INLET</initFromBoundary>
+
+	</initialization>
+
+
+    
+	<!--【7】 Write Setting-->
+	<writeControl>
+		<solutionWrite>
+			<writeType>tecplot</writeType>
+			<!--tecplot, cgns-->
+			<solutionType>onlyInstantaneous</solutionType>
+			<!-- onlyInstantaneous,
+			onlyAverage,
+			onlyPulse,
+			InatsntAndAve,
+			InstantAndAveAndPulse.
+			Default is onlyInstantaneous. 
+			-->
+			<varList>
+				<![CDATA[rho,v,p,E,T,Ma,allSpecies]]>    <!-- When use CoDACT or DACT, give parameters nSPInEveryCell and nRCInEveryCell would write out the number of simplified species and reactions in every cells. -->
+				<!-- ReynoldsStressTensor only available for RANS models. Do not specify this parameter in LES. -->
+			</varList>
+			<startTime>1e-4</startTime>
+		</solutionWrite>
+		<writeList>
+			<![CDATA[fieldVars]]>
+		</writeList>
+
+		<!--【7.1】 For entire flow field-->
+		<fieldVars>
+			<writeType>writeInstantFieldVar</writeType>
+
+			<write>on</write>
+			<!-- on or off. -->
+			<varList>
+				<![CDATA[rho,v,p,E,T,Ma,pt,kt,wt,nut,mut,mu,viscosityRatio]]>    <!-- When use CoDACT or DACT, give parameters nSPInEveryCell and nRCInEveryCell would write out the number of simplified species and reactions in every cells. -->
+			</varList>
+		</fieldVars>
+	</writeControl>
+</Config>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="OpenHurricane::storageDyn&lt;*,*&gt;">
+		<DisplayString>{{size = {size_}}}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">size_</Item>
+			<Item Name="[capacity]" ExcludeView="simple">(capacity_)</Item>
+			<ArrayItems ExcludeView="simple">
+				<Size>size_</Size>
+				<ValuePointer>element_</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="OpenHurricane::ArrayDyn&lt;*,*&gt;">
+		<DisplayString>{{size = {mData_.size_}}}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mData_.size_</Item>
+			<Item Name="[capacity]" ExcludeView="simple">(mData_.capacity_)</Item>
+			<ArrayItems ExcludeView="simple">
+				<Size>mData_.size_</Size>
+				<ValuePointer>mData_.element_</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="OpenHurricane::ArrayFix&lt;*,*&gt;">
+		<DisplayString>{{size = {mData_.nElements_}}}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">mData_.nElements_</Item>
+			<ArrayItems ExcludeView="simple">
+				<Size>mData_.nElements_</Size>
+				<ValuePointer>mData_.element_</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="OpenHurricane::Vector2D&lt;*&gt;">
+		<DisplayString>{{x={this->mData_.element_[0]}, y={this->mData_.element_[1]}}}</DisplayString>
+	</Type>
+	<Type Name="OpenHurricane::Vector&lt;*&gt;">
+		<DisplayString>{{x={this->mData_.element_[0]}, y={this->mData_.element_[1]}, z={this->mData_.element_[2]}}}</DisplayString>
+	</Type>
+	
+	<Type Name="OpenHurricane::Tensor&lt;*&gt;">
+		<DisplayString>[3, 3] (Tensor)</DisplayString>
+		<Expand>
+			<Synthetic Name="[row 0]" Condition="true">
+				<DisplayString>({this->mData_.element_[0]}, {this->mData_.element_[1]}, {this->mData_.element_[2]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[row 1]" Condition="true">
+				<DisplayString>({this->mData_.element_[3]}, {this->mData_.element_[4]}, {this->mData_.element_[5]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[row 2]" Condition="true">
+				<DisplayString>({this->mData_.element_[6]}, {this->mData_.element_[7]}, {this->mData_.element_[8]})</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+	
+	<Type Name="OpenHurricane::SymmTensor&lt;*&gt;">
+		<DisplayString>[3, 3] (SymmTensor)</DisplayString>
+		<Expand>
+			<Synthetic Name="[row 0]" Condition="true">
+				<DisplayString>({this->mData_.element_[0]}, {this->mData_.element_[1]}, {this->mData_.element_[2]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[row 1]" Condition="true">
+				<DisplayString>({this->mData_.element_[1]}, {this->mData_.element_[3]}, {this->mData_.element_[4]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[row 2]" Condition="true">
+				<DisplayString>({this->mData_.element_[2]}, {this->mData_.element_[4]}, {this->mData_.element_[5]})</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+	<Type Name="OpenHurricane::SphericalTensor&lt;*&gt;">
+		<DisplayString>[3, 3] (SphericalTensor)</DisplayString>
+		<Expand>
+			<Synthetic Name="[0, 0]" Condition="true">
+				<DisplayString>({this->ii_})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[1, 1]" Condition="true">
+				<DisplayString>({this->ii_})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[2, 2]" Condition="true">
+				<DisplayString>({this->ii_})</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+	<Type Name="OpenHurricane::DiagTensor&lt;*&gt;">
+		<DisplayString>[3, 3] (DiagTensor)</DisplayString>
+		<Expand>
+			<Synthetic Name="[0, 0]" Condition="true">
+				<DisplayString>({this->mData_.element_[0]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[1, 1]" Condition="true">
+				<DisplayString>({this->mData_.element_[1]})</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[2, 2]" Condition="true">
+				<DisplayString>({this->mData_.element_[2]})</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+	
+	<Type Name="OpenHurricane::HashMap&lt;*,*,*,*&gt;">
+		<DisplayString>{{Count = {elementCount_}}}</DisplayString>
+		<Expand>
+			<Item Name="[size]">elementCount_</Item>
+			<Item Name="[capacity]">(bucketCount_)</Item>
+			<CustomListItems MaxItemsPerView="5000" ExcludeView="Test">
+				<Variable Name="iBucket" InitialValue="-1" />
+				<Variable Name="pBucket" InitialValue="map_ == nullptr ? nullptr : *map_" />
+				<Variable Name="iBucketIncrement" InitialValue="-1" />
+
+				<Size>elementCount_</Size>
+				<Exec>pBucket = nullptr</Exec>
+				<Loop>
+					<If Condition="pBucket == nullptr">
+						<Exec>iBucket++</Exec>
+						<Exec>iBucketIncrement = __findnonnull(map_ + iBucket, bucketCount_ - iBucket)</Exec>
+						<Break Condition="iBucketIncrement == -1" />
+						<Exec>iBucket += iBucketIncrement</Exec>
+						<Exec>pBucket = map_[iBucket]</Exec>
+					</If>
+					<Item>pBucket,na</Item>
+					<Exec>pBucket = pBucket->next_</Exec>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+</AutoVisualizer>

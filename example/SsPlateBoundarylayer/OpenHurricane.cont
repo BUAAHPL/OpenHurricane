@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+*****************************************************************************************
+||  Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation.     ||
+||     - OpenHurricane CFD program.                                                    ||
+||	   Controller file .														   ||
+||     Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.             ||
+*****************************************************************************************
+-->
+<Config>
+	<!--【0】 Grid Setting-->
+	<meshSet>
+		<!--【0.1】 Mesh Source-->
+		<meshFile>ssplate.msh</meshFile>		<!-- fluent format : .msh; Hurricane format : .h5-->
+		<meshFormat>fluent</meshFormat>		<!-- fluent, CGNS, PLOT3D or Hurricane-->
+		<unit>mm</unit>
+		<reordering>RCMReordering</reordering>		<!-- MetisReordering or RCMReordering -->
+
+	</meshSet>
+
+	<!--【1】 Iteration Setting-->
+	<iteration>
+		<!--【1.1】 Step&Write setting-->
+		<maxStep>5000</maxStep>
+		<totalStep>0</totalStep>
+		<writeOutputStep>100</writeOutputStep>
+		<!--<restartFrom>Hurricane-10000.h5</restartFrom>
+
+		<!--【1.2】 Time dependence-->
+		<flowState>steady</flowState>
+
+		<pseudoTime>
+			<timeStepMethod>cellBasedMethod</timeStepMethod>
+			<!-- faceBasedMethod or cellBasedMethod -->
+			<CFLSetting>
+				<cflMin>1</cflMin>
+				<!-- The minimum CFL number. Default is 0.1 . -->
+				<cflMax>10.0</cflMax>
+				<!-- The maximum CFL number. Default is 10.0 . -->
+				<!-- CFL number-->
+				<stepForPrintCFL>100</stepForPrintCFL>
+
+				<!-- (1) linearCFL -->
+				<CFLType>linearCFL</CFLType>
+				<!-- The CFL type for adapting CFL number. Can be: linearCFL, expCFL or expertSystemAdaptCFL. If not specified, the linearCFL will be used. -->
+				<linearCFL>
+					<cflConst>3</cflConst>
+					<cflLinear>5</cflLinear>
+				</linearCFL>
+
+
+			</CFLSetting>
+			<!-- Time Scheme-->
+			<timeStepType>localTimeStep</timeStepType>
+			<!-- localTimeStep or globalTimeStep, the default value is localTimeStep-->
+			<CForTimeStep>2.0</CForTimeStep>
+			<!-- Range [1,4]-->
+
+			<!-- Convergence Acceleration for Stretched Meshes-->
+			<isStretchAc>off</isStretchAc>
+			<!-- Notice : Only works in implicit time scheme. Default is on. -->
+			<StretchAc>
+				<minStretchScale>1.0</minStretchScale>
+				<cflRatioMax>5000000.0</cflRatioMax>
+			</StretchAc>
+
+			<minCellOrthogonality>0.7</minCellOrthogonality>
+			<!-- The maximum cell orthogonality for correct the time step. Default is 0.7. -->
+		</pseudoTime>
+
+		<timeMethod>
+			<!-- (1) LUSGS. Implicit scheme. -->
+			<timeMarching>LUSGS</timeMarching>
+			<!-- For unsteady flow:	<timeMarching>unsteadyLUSGS</timeMarching> -->
+			<LUSGS>
+				<omegaForLUSGS>1.10</omegaForLUSGS>
+				<!-- Range [1,2]-->
+				<betaT>0.2</betaT>
+			</LUSGS>
+
+			<sourceTermTreating>diagImpliciSource</sourceTermTreating>
+			<!-- explicitSource, diagImpliciSource or fullJacobian. Default is explicitSource. -->
+		</timeMethod>
+
+		<monitor>
+			<monitorList><![CDATA[residuals]]></monitorList>
+			<!--【1.6】 Residuals Write Setting-->
+			<residuals>
+				<monitorType>residuals</monitorType>
+				<updateStep>1</updateStep>
+				<writeToFile>off</writeToFile>
+				<!-- On or off. Should write the information to the file. Default is off. -->
+				<fileName>HurricaneResidual.dat</fileName>
+				<!-- Defalut is case name + "_residuals.dat".  -->
+				<varList><![CDATA[rho,v,E,kt,wt]]></varList>
+				<!-- Notice: if vector-type variables, the vector name is only valid while the name of every component of this vecotr is not essential-->
+				<residualConvergence>off</residualConvergence>
+				<!-- On or off, default is off. -->
+				<rho>1e-6</rho>
+				<v>(1e-6,1e-6,1e-6)</v>
+				<!-- Notice: if vector-type variables-->
+				<E>1e-6</E>
+				<kt>1e-6</kt>
+				<wt>1e-6</wt>
+			</residuals>
+		
+		</monitor>
+
+	</iteration>
+
+	<!--【2】 Spatial Scheme-->
+	<spatialScheme>
+		<!--【2.1】 Flux-->
+		<spatialScheme>upwindSchemes</spatialScheme>
+		<!-- upwindSchemes, blendingScheme,blendingSchemeTVDLimiter,blendingSchemeTVDLimiter2, JST, KNP or KT-->
+		
+		<upwindSchemes>
+			<upwindScheme>HLLC</upwindScheme>			<!--AUSMPWPlus, AUSMPlusUP, LDFSS2, HLLC, HLLC_HLL, AUSM, HLL, or vanLeer-->
+
+		</upwindSchemes>
+
+		<isLowMachCorrection>off</isLowMachCorrection>
+		
+		<reconstruction>linear</reconstruction>
+		<limitersForLinear>Venk</limitersForLinear>
+		<K>0.010</K>
+		<!--【2.3】 Gradient-->
+		<gradient>cellGaussGrad</gradient>
+		<cellNeighbourCell>FACENEIGHBOUR</cellNeighbourCell>
+	</spatialScheme>
+
+	<!--【3】 Flow Setting-->
+	<flow>
+
+		<!--【3.1】 Flow Model-->
+		<flowModel>laminarFlow</flowModel>
+		<!-- EulerFlow, laminarFlow or eddyViscosity-->
+		<Prl>0.72</Prl>
+		<!-- Laminar Prandtl number-->
+
+		<!--【3.2】 Turbulence Setting-->
+		<Prt>0.90</Prt>
+		<!-- Turbulent Prandtl number-->
+		<Sct>0.5</Sct>
+		<!-- Turbulent Schmidt number-->
+
+		<!--【3.3】 Limits Setting-->
+		<limits>
+			<limitMethod>directly</limitMethod>
+			<!-- directly or average-->
+			<!--Temperature-->
+			<THigh>3800.0</THigh>
+			<TLow>1.0</TLow>
+			<!--Pressure-->
+			<pHigh>6930000</pHigh>
+			<pLow>1.0</pLow>
+			<!--Eddy Viscousity-->
+			<mutHigh>2.0e5</mutHigh>
+			<mutLow>1.0e-15</mutLow>
+
+			<minKt>1e-14</minKt>
+			<!-- default is 1e-14 -->
+			<minWt>1e-20</minWt>
+			<!-- default is 1e-20 -->
+		</limits>
+
+		<!--【3.4】 Species Setting-->
+		<mixture>
+			<equationOfState>perfectGas</equationOfState>
+			<chemical>singleSp</chemical>			<!--singleSp, mixing or reaction-->
+			<maxSubStep>3</maxSubStep>
+			<thermo>
+				<!-- (1) Const Cp. -->
+				<type>constCp</type>
+				<constCp>
+					<cp>1004.0</cp>
+					<hc>0.0</hc>
+				</constCp>
+
+			</thermo>
+			<transport>
+				<!-- (1) Sutherland with three parameters. -->
+				<type>sutherlandThree</type>
+				<sutherlandThree>
+					<mu0>1.716e-5</mu0>
+					<T0>273.11</T0>
+					<S>110.56</S>
+				</sutherlandThree>
+			</transport>	
+		</mixture>
+	</flow>
+
+
+	<!--【4】 Boundary Condition-->
+	<boundaryCondition>
+
+		<!--【4.1】 pressure-far-field or supersonic inlet boundary condition. -->
+		<IN>
+			<!-- Boundary type -->
+			<bcType>pressureFarField</bcType>
+			<momentumGivenBy>pressureAndMach</momentumGivenBy>
+			<ma>2</ma>
+			<p>2534.0</p>
+
+			<!-- Direction -->
+			<directionType>directionVector</directionType>
+			<direction>car(1,0,0)</direction>
+			<!-- Thermal -->
+			<T>221.6</T>
+
+			
+		</IN>
+		<FAR>
+			<!-- Boundary type -->
+			<bcType>pressureFarField</bcType>
+			<momentumGivenBy>pressureAndMach</momentumGivenBy>
+			<p>2534</p>
+			<ma>2</ma>
+
+			<directionType>directionVector</directionType>
+			<direction>car(1,0,0)</direction>
+
+			<!-- Thermal -->
+			<T>221.6</T>	
+		</FAR>
+	
+
+		<!--【4.4】 pressure outlet -->
+		<OUT>
+			<bcType>pressureOutlet</bcType>
+			<p>2534</p>
+		</OUT>
+
+		
+
+		<WALL>
+			<!--【A】 Basic Condition -->
+			<bcType>wall</bcType>
+			<momentum>
+				<shearCondition>noSlip</shearCondition>
+				<!-- noSlip, invSlip or rareSlip-->
+
+			</momentum>
+			<thermal>
+				<thermalCondition>adiabatic</thermalCondition>
+				<!-- isothermal, adiabatic or rareTempJump-->
+
+			</thermal>
+
+
+			<!--【B】 Turbulent Wall Condition -->
+			<wallFunction>off</wallFunction>
+			<!-- on of off-->
+			
+
+		</WALL>
+		
+
+		<!--【4.7】 Symmetry -->
+		<SYM1>
+			<bcType>symmetry</bcType>
+		</SYM1>
+		
+		<SYM2>
+			<bcType>symmetry</bcType>
+		</SYM2>
+		<SYM3>
+			<bcType>symmetry</bcType>
+		</SYM3>
+
+	
+
+	</boundaryCondition>
+
+	<!--【5】 Reference Value-->
+
+
+	
+
+	<!--【6】 Initialization-->
+	<initialization>
+
+
+		<initFromBoundary>IN</initFromBoundary>
+		<!--【C】 Hybrid Initialization-->
+ 
+	
+	</initialization>
+
+
+    
+	<!--【7】 Write Setting-->
+	<writeControl>
+		<solutionWrite>
+			<writeType>tecplot</writeType>
+			<!--tecplot, cgns-->
+			<solutionType>onlyInstantaneous</solutionType>
+			<!-- onlyInstantaneous,
+			onlyAverage,
+			onlyPulse,
+			InatsntAndAve,
+			InstantAndAveAndPulse.
+			Default is onlyInstantaneous. 
+			-->
+			<varList>
+				<![CDATA[rho,p,v,E,T,Ma]]>    <!-- When use CoDACT or DACT, give parameters nSPInEveryCell and nRCInEveryCell would write out the number of simplified species and reactions in every cells. -->
+				<!-- ReynoldsStressTensor only available for RANS models. Do not specify this parameter in LES. -->
+			</varList>
+
+		</solutionWrite>
+
+
+
+
+
+	</writeControl>
+
+
+</Config>

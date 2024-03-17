@@ -1,0 +1,21 @@
+ELEMENTS H O N END
+SPECIES 
+    H2 O2 H O OH H2O NO N N2
+END
+REACTIONS  MOLES  KELVINS
+ H + O2 = O + OH    1.91E+14  0  8273   
+ O + H2 = H + OH    5.06E+4   2.67  3166   
+ OH + OH = O + H2O   1.5E+09     1.14  0     
+ OH + H2 = H + H2O   2.16E8   1.51  1726   
+ O + NO = N + O2     3.8E+9    1.0  20820
+ O + N2 = NO + N     1.82E+14   0  38370 
+ H + NO = N + OH      1.7E+14  0  24560
+ H + H + M = H2 + M   7.3E+17  -1.0  0 
+      H2/2.5/ H2O/16.25/
+ H + O + M = OH + M   2.6E+16 -0.6   0
+    H2/2.5/ H2O/16.25/
+ O + O + M = O2 + M   1.14E+17  -1.0  0
+    H2/2.5/ H2O/16.25/
+ H + OH + M = H2O + M 8.62E+21 -2.0  0 
+    H2/2.5/ H2O/16.25/
+END

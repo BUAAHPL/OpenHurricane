@@ -1,0 +1,76 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+
+
+# Compiled Static libraries
+
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Build results
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+docs/doxygen/html/
+docs/doxygen/searchdata.xml
+docs/doxygen/latex/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+.vscode/
+
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+*.sqlite
+.vs/slnx.sqlite
+*.json
+CMakeSettings.json
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap

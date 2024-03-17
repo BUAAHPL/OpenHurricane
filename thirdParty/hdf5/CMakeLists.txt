@@ -1,0 +1,48 @@
+# Author: Rao Sihang
+cmake_minimum_required (VERSION 3.18)
+message ( STATUS "The current cmake file is ${CMAKE_CURRENT_LIST_FILE}" ) 
+
+if(NOT WIN32)# Linux
+    if( CMAKE_BUILD_TYPE STREQUAL "Debug" )    
+        get_filename_component(lib_abs "lib/Linux/libhdf5_cpp.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5_test.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5_tools.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libszip.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libz.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+    else( CMAKE_BUILD_TYPE STREQUAL "Debug" )#release
+        get_filename_component(lib_abs "lib/Linux/libhdf5_cpp.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5_test.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5_tools.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libhdf5.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libszip.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Linux/libz.a" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+    endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+     
+else(NOT WIN32)#Windows
+    if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+        get_filename_component(lib_abs "lib/Windows/libhdf5_D.lib" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Windows/libhdf5_cpp_D.lib" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+    else( CMAKE_BUILD_TYPE STREQUAL "Debug" )#release
+        get_filename_component(lib_abs "lib/Windows/libhdf5.lib" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")
+        get_filename_component(lib_abs "lib/Windows/libhdf5_cpp.lib" ABSOLUTE)
+        set_property(GLOBAL APPEND PROPERTY PRJ_LIBRARIES "${lib_abs}")      
+    endif( CMAKE_BUILD_TYPE STREQUAL "Debug" )
+endif(NOT WIN32)
+
+set_property(GLOBAL APPEND PROPERTY global_include_dirs1 "${CMAKE_CURRENT_SOURCE_DIR}/include")

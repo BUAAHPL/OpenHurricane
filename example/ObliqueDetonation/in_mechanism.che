@@ -1,0 +1,34 @@
+!Reference: Jachimowski, Casimir J . "An Analysis of Combustion Studies in Shock Expansion Tunnels and Reflected Shock Tunnels." NASA Langley Technical Report Server (1992) 1–9.
+ELEMENTS
+O N H
+END
+SPECIES
+O2 O H2 H2O OH H H2O2 HO2 N2
+END
+REACTIONS
+ H2 + O2 = HO2 + H	  7.00E+13  0.0  56800      
+ H + O2 = OH + O	  2.20E+14  0.0  16800
+ O + H2 = OH + H	  5.06E+4  2.67  6290        
+ OH + H2 = H2O + H    2.16E+8  1.51  3430        
+ OH + OH = H2O + O	  1.50E+9  1.14  0.0         
+ H + OH + M = H2O + M	 8.62E+21  -2.0  0.0    
+H2/2.5/ H2O/16.0/ 
+ H + H + M = H2 + M	  7.30E+17  -1.0  0.0       
+H2/2.5/ H2O/16.0/ 
+ H + O + M = OH + M	  2.60E+16  -0.6  0.0        
+H2/2.5/ H2O/16.0/
+ O + O + M = O2 + M	  1.10E+17  -1.0  0.0        
+H2/2.5/ H2O/16.0/ 
+ H + O2 + M = HO2 + M	  2.30E+18  -1.0  0.0  
+H2/2.5/ H2O/16.0/ 
+ HO2 + H = OH + OH	  1.50E+14  0.0  1000      
+ HO2 + O = O2 + OH	  2.00E+13  0.0  0.0         
+ HO2 + OH = H2O + O2	  2.00E+13  0.0  0.0     
+ HO2 + HO2 = H2O2 + O2	  2.00E+12  0.0  0.0     
+ H + H2O2 = H2 + HO2    1.70E+12  0.0  3780     
+ H + H2O2 = OH + H2O    1.00E+13  0.0  3580      
+ O + H2O2 = OH + HO2    2.80E+13  0.0  6400
+ OH + H2O2 = H2O + HO2    7.00E+12  0.0  1435   
+ OH + OH + M = H2O2 + M	  1.60E+22  -2.0  0.0    
+H2/2.5/ H2O/16.0/ 
+END

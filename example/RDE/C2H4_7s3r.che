@@ -1,0 +1,12 @@
+!   Reference: Baurle R. A., Eklund D. R.. Analysis of dual-mode hydrocarbon scramjet operation at Mach 4-6.5[J].
+!   Journal of Propulsion and Power, 2002, 18(5): 990-1002
+!   7 species and 3 reactions
+ELEMENTS H C O N END
+SPECIES 
+ C2H4 H2 O2 CO CO2 H2O N2
+END
+REACTIONS      
+C2H4 + O2 <=> 2CO +  2H2         		2.10e14    0.0   18015.3   !1
+2CO + O2 <=> 2CO2              		3.48e11    2.0   10134.9   !2
+O2 + 2H2 <=> 2H2O          		3.00e20    -1.0     0   !3
+END

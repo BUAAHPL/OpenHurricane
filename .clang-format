@@ -1,0 +1,27 @@
+#基于那个配置文件
+BasedOnStyle: LLVM
+Language: Cpp
+IndentWidth: 4
+AccessModifierOffset: -4
+CommentPragmas:  '^ *'
+ColumnLimit: 100
+SpaceAfterTemplateKeyword: true
+AlwaysBreakAfterReturnType: None
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+AlignTrailingComments: true
+BinPackArguments: true
+BinPackParameters: true
+AlignAfterOpenBracket: Align
+#AlignConsecutiveAssignments: true
+#AlignConsecutiveDeclarations: true
+AlignEscapedNewlines: Left
+AlignOperands: Align
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+
+NamespaceIndentation: All

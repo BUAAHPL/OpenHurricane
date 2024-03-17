@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+*****************************************************************************************
+||  Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation.     ||
+||     - OpenHurricane CFD program.                                                    ||
+||	   Controller file .														   ||
+||     Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.             ||
+*****************************************************************************************
+-->
+<Config>
+	<!--【0】 Grid Setting-->
+	<meshSet>
+		<!--【0.1】 Mesh Source-->
+		<meshFile>sodShockTube400.msh</meshFile>		<!-- fluent format : .msh; Hurricane format : .h5-->
+		<meshFormat>fluent</meshFormat>		<!-- fluent, CGNS, PLOT3D or Hurricane-->
+		<unit>m</unit>
+		<reordering>RCMReordering</reordering>		<!-- MetisReordering or RCMReordering -->
+		<scaleMesh>(1,1,0.1)</scaleMesh>
+		<regions>
+			<![CDATA[region3]]>
+		</regions>
+		<region3>
+			<id>3</id>
+			<option>inside</option>
+			<shape>plane</shape>
+			<normal>(-1.0,0.0,0.0)</normal>
+			<point>(0.0,1.0,0.0)</point>
+		</region3>
+
+	</meshSet>
+
+	<!--【1】 Iteration Setting-->
+	<iteration>
+		<!--【1.1】 Step&Write setting-->
+		<maxStep>500</maxStep>
+		<totalStep>0</totalStep>
+		<writeOutputStep>500</writeOutputStep>
+		<!--<restartFrom>Hurricane-1.h5</restartFrom>-->
+
+		<!--【1.2】 Time dependence-->
+		<flowState>unsteady</flowState>
+		<pseudoTime>
+			<timeStepMethod>cellBasedMethod</timeStepMethod>
+			<!-- faceBasedMethod or cellBasedMethod -->
+			<CFLSetting>
+				<cflMin>0.1</cflMin>
+				<!-- The minimum CFL number. Default is 0.1 . -->
+				<cflMax>10.0</cflMax>
+				<!-- The maximum CFL number. Default is 10.0 . -->
+				<!-- CFL number-->
+				<stepForPrintCFL>20</stepForPrintCFL>
+
+				<!-- (1) linearCFL -->
+				<CFLType>linearCFL</CFLType>
+				<!-- The CFL type for adapting CFL number. Can be: linearCFL, expCFL or expertSystemAdaptCFL. If not specified, the linearCFL will be used. -->
+				<linearCFL>
+					<cflConst>200</cflConst>
+					<cflLinear>400</cflLinear>
+				</linearCFL>
+
+				<!-- (2) expCFL. Only for implicit scheme. -->
+				<!-- <CFLType>expCFL</CFLType> -->
+				<expCFL>
+					<cflConst>200</cflConst>
+				</expCFL>
+
+				<!-- (3) expertSystemAdaptCFL. Only for implicit scheme. -->
+				<!--<CFLType>expertSystemAdaptCFL</CFLType> -->
+				<expertSystemAdaptCFL>
+					<CFLFactor0>0.01</CFLFactor0>
+					<breakdownFactor>0.5</breakdownFactor>
+					<divergenceFactor>0.8</divergenceFactor>
+					<residualJumpThreshold>0.5</residualJumpThreshold>
+					<updateFactor>2.0</updateFactor>
+					<interval>10</interval>
+				</expertSystemAdaptCFL>
+			</CFLSetting>
+			<!-- Time Scheme-->
+			<timeStepType>localTimeStep</timeStepType>
+			<!-- localTimeStep or globalTimeStep, the default value is localTimeStep-->
+			<CForTimeStep>0</CForTimeStep>
+			<!-- Range [1,4]-->
+			<isStretchAc>on</isStretchAc>												<!-- Notice : Only works in implicit time scheme. Default is on. -->
+			<StretchAc>
+				<minStretchScale>10.0</minStretchScale>					
+				<cflRatioMax>8.0</cflRatioMax>
+			</StretchAc>
+			<minCellOrthogonality>0.65</minCellOrthogonality> 
+		</pseudoTime>
+
+		<timeMethod>
+			<!-- (1) LUSGS. Implicit scheme. -->
+			<timeMarching>unsteadyTVDRK</timeMarching><!----><!-- For unsteady flow: unsteadyTVDRK -->
+			<TVDRK>
+				<TVDRKOrder>TVDRK3</TVDRKOrder>	<!-- TVDRK2 - TVD RK 2 order, TVDRK3 - TVD RK 3 order-->
+				<cfl>1.0</cfl>
+			</TVDRK>
+
+			<LUSGS>
+				<omegaForLUSGS>1.050</omegaForLUSGS>
+				<!-- Range [1,2]-->
+				<betaT>0.2</betaT>
+			</LUSGS>
+			<!-- For unsteady flow: unsteadyTVDRK4 -->
+
+
+			<!-- For unsteady flow. -->
+			<physicalTimes>
+				<dynamicTimeStep>off</dynamicTimeStep>
+				<!-- on or off. Default is off.-->
+				<dynamicCFL>0.8</dynamicCFL>
+				<!-- If the dynamicTimeStep is used, then user can specify the CFL number. If it is not given, 
+				                                    it will be 0.8 as defaul for BDF123LUSGS and ESDIRKLUSGS, or taken from that of explicit scheme, such as unsteadyTVDRK, unsteadyTVDRK4 or unsteadyMRK. -->
+				<phyTimeStep>1.36176e-5</phyTimeStep>
+				<!-- When dynamic time-step is used, this parameter will be ignored. -->
+				<maxPhyTime>0.0068088</maxPhyTime>
+				<totalPhyTime>0</totalPhyTime>
+			</physicalTimes>
+			<!-- <dualTimeStep> -->
+				<!-- <subIteration> -->
+					<!-- <maxSubStep>20</maxSubStep> -->
+					<!-- <minSubStep>10</minSubStep> -->
+				<!-- </subIteration> -->
+				<!-- <iterationMethod>Newton</iterationMethod> -->
+				<!-- Newton or pseudoTimeStepping -->
+				<!-- <newTimeStepInitialize>LagrangeExterpolation</newTimeStepInitialize> -->
+				<!-- lastTime or LagrangeExterpolation -->
+				<!-- <beginStep>18</beginStep> -->
+			<!-- </dualTimeStep> -->
+
+			<BDF123LUSGS>
+				<BDF123>BDF2</BDF123>
+				<!-- BDF1、BDF2 or BDF3-->
+			</BDF123LUSGS>
+
+			<sourceTermTreating>explicitSource</sourceTermTreating>
+			<!-- explicitSource, diagImpliciSource or fullJacobian. Default is explicitSource. -->
+		</timeMethod>
+
+		<monitor>
+			<monitorList><![CDATA[residuals]]></monitorList>
+			<!--【1.6】 Residuals Write Setting-->
+			<residuals>
+				<monitorType>residuals</monitorType>
+				<updateStep>1</updateStep>
+				<writeToFile>off</writeToFile>
+				<!-- On or off. Should write the information to the file. Default is off. -->
+				<fileName>HurricaneResidual.dat</fileName>
+				<!-- Defalut is case name + "_residuals.dat".  -->
+				<varList><![CDATA[rho,v,E,kt,wt]]></varList>
+				<!-- Notice: if vector-type variables, the vector name is only valid while the name of every component of this vecotr is not essential-->
+				<residualConvergence>off</residualConvergence>
+				<!-- On or off, default is off. -->
+				<rho>1e-6</rho>
+				<v>(1e-6,1e-6,1e-6)</v>
+				<!-- Notice: if vector-type variables-->
+				<E>1e-6</E>
+				<kt>1e-6</kt>
+				<wt>1e-6</wt>
+			</residuals>
+
+		</monitor>
+
+	</iteration>
+
+	<!--【2】 Spatial Scheme-->
+	<spatialScheme>
+		<!--【2.1】 Flux-->
+		<spatialScheme>upwindSchemes</spatialScheme>
+		<!-- upwindSchemes, blendingScheme,blendingSchemeTVDLimiter,blendingSchemeTVDLimiter2, JST, KNP or KT-->
+
+		<upwindSchemes>
+			<upwindScheme>HLLC</upwindScheme>		<!--AUSMPWPlus, AUSMPlusUP, LDFSS2, HLLC, HLLC_HLL, AUSM, HLL, or vanLeer-->
+
+			<AUSMPlusUP>
+				<!--AUSMPlusUP scheme parameters>-->
+				<Kp>0.25</Kp>														
+				<Ku>0.75</Ku>
+				<sigma>1.0</sigma>
+				<beta>0.125</beta>
+			</AUSMPlusUP>
+		</upwindSchemes>
+
+		<isLowMachCorrection>off</isLowMachCorrection>
+
+		<reconstruction>linear</reconstruction>
+		<limitersForLinear>Venk</limitersForLinear>
+		<K>0.010</K>
+
+		<!--【2.3】 Gradient-->
+		<gradient>leastSquareGrad</gradient>
+		<weightType>WLSQG</weightType>
+		<cellNeighbourCell>NODENEIGHBOUR</cellNeighbourCell>
+		<!-- FACENEIGHBOUR, NODENEIGHBOUR or TWOFACENEIGHBOUR-->
+	</spatialScheme>
+
+	<!--【3】 Flow Setting-->
+	<flow>
+
+		<!--【3.1】 Flow Model-->
+		<flowModel>EulerFlow</flowModel>
+		<!-- EulerFlow, laminarFlow or eddyViscosity-->
+		<Prl>0.72</Prl>
+		<!-- Laminar Prandtl number-->
+
+		<!--【3.2】 Turbulence Setting-->
+		<Prt>0.90</Prt>
+		<!-- Turbulent Prandtl number-->
+		<Sct>0.5</Sct>
+		<!-- Turbulent Schmidt number-->
+
+
+		<!--【3.3】 Limits Setting-->
+		<limits>
+			<limitMethod>directly</limitMethod>
+			<!-- directly or average-->
+			<!--Temperature-->
+			<THigh>3800.0</THigh>
+			<TLow>110.0</TLow>
+			<!--Pressure-->
+			<pHigh>6930000</pHigh>
+			<pLow>1.0</pLow>
+			<!--Eddy Viscousity-->
+			<mutHigh>2.0e5</mutHigh>
+			<mutLow>1.0e-15</mutLow>
+
+			<minKt>1e-14</minKt>
+			<!-- default is 1e-14 -->
+			<minWt>1e-20</minWt>
+			<!-- default is 1e-20 -->
+		</limits>
+
+		<!--【3.4】 Species Setting-->
+		<mixture>
+			<equationOfState>perfectGas</equationOfState>
+			<chemical>singleSp</chemical>			<!--singleSp, mixing or reaction-->
+			
+			<maxSubStep>3</maxSubStep>
+
+			<thermo>
+				<!-- (1) Const Cp. -->
+				<type>constCp</type>
+				<constCp>
+					<cp>1004.0</cp>
+					<hc>0.0</hc>
+				</constCp>
+
+			</thermo>
+
+			<transport>
+				<!-- (1) Sutherland with three parameters. -->
+				<type>sutherlandThree</type>
+				<sutherlandThree>
+					<mu0>1.716e-5</mu0>
+					<T0>273.11</T0>
+					<S>110.56</S>
+				</sutherlandThree>
+			</transport>
+
+		</mixture>
+	</flow>
+
+
+	<!--【4】 Boundary Condition-->
+	<boundaryCondition>
+
+		<IN>
+			<!--【A】 Basic Condition -->
+			<bcType>wall</bcType>
+			<momentum>
+				<shearCondition>noSlip</shearCondition>
+			</momentum>
+			<thermal>
+				<thermalCondition>adiabatic</thermalCondition>
+			</thermal>
+		</IN>
+		<OUT>
+			<!--【A】 Basic Condition -->
+			<bcType>wall</bcType>
+			<momentum>
+				<shearCondition>noSlip</shearCondition>
+			</momentum>
+			<thermal>
+				<thermalCondition>adiabatic</thermalCondition>
+			</thermal>
+		</OUT>
+		<WALL>
+			<!--【A】 Basic Condition -->
+			<bcType>wall</bcType>
+			<momentum>
+				<shearCondition>noSlip</shearCondition>
+			</momentum>
+			<thermal>
+				<thermalCondition>adiabatic</thermalCondition>
+			</thermal>
+		</WALL>
+
+		<!--【4.7】 Symmetry -->
+		<SYM1>
+			<bcType>symmetry</bcType>
+		</SYM1>
+		<SYM2>
+			<bcType>symmetry</bcType>
+		</SYM2>
+
+	</boundaryCondition>
+
+	<!--【5】 Reference Value-->
+	<ref>
+
+		<length>1.0</length>
+		<!-- The reference length [m], which is used to compute the moment coefficient. Default is 1. -->
+		<area>1</area>
+		<!-- The reference area, which is used to compute the force and the moment coefficients. [m^2]. Default is 1. -->
+		<density>1.225</density>
+		<!-- The reference density. [kg/m^3] -->
+		<enthalpy>0.0</enthalpy>
+		<pressure>0.0</pressure>
+		<temperature>288.16</temperature>
+		<velocity>1</velocity>
+		<viscosity>1.7894e-5</viscosity>
+		<specificHeatRatio>1.4</specificHeatRatio>
+		<gasConstantNumber>287.06</gasConstantNumber>
+	</ref>
+
+	<!--【6】 Initialization-->
+	<initialization>
+		<initFromBoundary>IN</initFromBoundary>
+		<!--Initialize from Given Value-->
+		<initFromValue>
+			<rho>1.225</rho>
+			<v>(0,0,0)</v>
+			<p>105494.55</p>
+			<T>300</T>
+			<E>215082</E>
+		</initFromValue>
+
+
+		<!-- 【6.2】Patch Region-->
+		<initPatch>
+			<![CDATA[patch2]]>
+		</initPatch>
+		<patch2>
+			<region>region3</region>
+			<type>uniform</type>
+			<!-- type : uniform or distributed -->
+			<patchVar>
+				<![CDATA[T,rho,p,E,v]]>
+			</patchVar>
+			<p>10549.455</p>
+			<v>(0.0,0.0,0.0)</v>
+			<rho>0.153125</rho>
+			<T>240</T>
+			<E>173068.5714</E>
+		</patch2>
+	</initialization>
+
+
+	<!--【7】 Write Setting-->
+	<writeControl>
+		<solutionWrite>
+			<writeType>tecplot</writeType>
+			<!--tecplot, cgns-->
+			<solutionType>onlyInstantaneous</solutionType>
+			<varList>
+				<![CDATA[rho,v,p,E,T,TGrad,Ma,pt,pt_constCp,Tt,Tt_constCp,mu,mut,kt,wt,cp,gamma,kappa,
+				]]>   
+			</varList>
+		</solutionWrite>
+	</writeControl>
+
+</Config>

@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+*****************************************************************************************
+||  Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation.     ||
+||     - OpenHurricane CFD program.                                                    ||
+||	   Controller file example.														   ||
+||     Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.             ||
+*****************************************************************************************
+-->
+<Config>
+	<!--[0] Grid Setting-->
+	<meshSet>
+		<!--[0.1] Mesh Source-->
+		<meshFile>fluent.msh</meshFile>		<!-- fluent format : .msh; OpenHurricane format : .h5-->
+		<meshFormat>fluent</meshFormat>		<!-- fluent, CGNS, or OpenHurricane-->
+		<unit>mm</unit>
+		<reordering>RCMReordering</reordering>		<!-- MetisReordering or RCMReordering -->
+
+
+		<!--[0.2] Scale Mesh with given 3D factor. -->
+		<!-- <scaleMesh>(1.0,1.0,1.0)</scaleMesh> -->
+
+		<!--[0.3] Region Section-->
+		<regions>
+			<![CDATA[region0,region1,region2]]>
+		</regions>
+		<!-- shape: hex, sphere or cylinder or plane-->   								<!-- Unit: m-->
+        <region0>
+            <id>0</id>
+            <option>inside</option>
+            <shape>hex</shape>															
+		    <xmax>0.01</xmax>
+            <xmin>0</xmin>
+            <ymax>0.02</ymax>
+            <ymin>0.0</ymin>
+            <zmax>0.0002</zmax>
+            <zmin>0.0</zmin>	
+        </region0>
+		<region1>
+            <id>1</id>
+            <option>inside</option>
+            <shape>hex</shape>															
+		    <xmax>0.015</xmax>
+            <xmin>0.01</xmin>
+            <ymax>0.02</ymax>
+            <ymin>0.0</ymin>
+            <zmax>0.0002</zmax>
+            <zmin>0.0</zmin>	
+        </region1>
+		<region2>
+            <id>2</id>
+            <option>inside</option>
+            <shape>hex</shape>															
+		    <xmax>0.235</xmax>
+            <xmin>0.015</xmin>
+            <ymax>0.02</ymax>
+            <ymin>0.0</ymin>
+            <zmax>0.0002</zmax>
+            <zmin>0.0</zmin>	
+        </region2>
+	</meshSet>
+
+	<!--[1] Iteration Setting-->
+	<iteration>
+		<!--[1.1] Step&Write setting-->
+		<maxStep>3000000</maxStep>
+		<writeOutputStep>300</writeOutputStep>
+		<!--[1.2] Relay if "restartFrom" is turned on. -->
+		<!--<restartFrom>OpenHurricane-1.h5</restartFrom>-->
+		<relayType>originData</relayType>		<!-- originData or interpolationData. Default is originData-->
+		<nearNodes>1</nearNodes>		<!--Default is 1.-->
+
+		<!--[1.3] Time dependence-->
+		<flowState>unsteady</flowState>		<!-- The flow state can be steady or unsteady. -->
+
+		<!--[1.4] Pseudo time-step method. -->
+		<pseudoTime>
+			<timeStepMethod>cellBasedMethod</timeStepMethod>			<!-- faceBasedMethod or cellBasedMethod -->
+			<CFLSetting>
+				<cflMin>1.0</cflMin> 													<!-- The minimum CFL number. Default is 0.1 . --> 
+				<cflMax>5.0</cflMax>  				<!-- The maximum CFL number. Default is 10.0 . -->
+				
+				<stepForPrintCFL>20</stepForPrintCFL>
+
+				<!-- Dynamic CFL number method: -->
+				<CFLType>linearCFL</CFLType>				<!-- The CFL type for adapting CFL number. 
+																 Can be: linearCFL, expCFL or expertSystemAdaptCFL.
+																 If not specified, the linearCFL will be used. 
+															-->
+				<!--(1) For "linearCFL" (linear method). -->
+				<linearCFL>
+					<cflConst>3</cflConst>
+					<cflLinear>5</cflLinear>
+				</linearCFL>
+
+			</CFLSetting>
+			
+			<timeStepType>localTimeStep</timeStepType>			<!-- localTimeStep or globalTimeStep, the default value is localTimeStep-->
+			<CForTimeStep>0.0</CForTimeStep>			<!-- Range [1,4]-->
+
+			<isStretchAc>off</isStretchAc>				<!-- Convergence Acceleration for Stretched Meshes.
+															 Notice : Only works in implicit time scheme. Default is on. -->
+			<StretchAc>
+				<minStretchScale>100.0</minStretchScale>
+				<cflRatioMax>500.0</cflRatioMax>
+			</StretchAc>
+
+			<minCellOrthogonality>0.7</minCellOrthogonality>			<!-- The maximum cell orthogonality for correct the time step. Default is 0.7. -->
+		</pseudoTime>
+
+		<!--[1.5] Time scheme. -->
+		<timeMethod>
+			<!-- (1) LUSGS. Implicit scheme. -->
+			<timeMarching>BDF123LUSGS</timeMarching>
+			<!-- For unsteady flow:	<timeMarching>unsteadyLUSGS</timeMarching> -->
+			<LUSGS>
+				<omegaForLUSGS>1.050</omegaForLUSGS>				<!-- Range [1,2]-->
+				<betaT>0.2</betaT>
+			</LUSGS>
+
+			<!-- For unsteady flow. -->
+			<physicalTimes>
+				<dynamicTimeStep>off</dynamicTimeStep>				<!-- on or off. Default is off.-->
+				<dynamicCFL>0.1</dynamicCFL>
+				<!-- If the dynamicTimeStep is used, then user can specify the CFL number. If it is not given, 
+				                                    it will be 0.8 as defaul for BDF123LUSGS, or taken from that of explicit scheme, such as unsteadyTVDRK, unsteadyTVDRK4 or unsteadyMRK. -->
+				<phyTimeStep>5e-9</phyTimeStep>				<!-- When dynamic time-step is used, this parameter will be ignored. -->
+				<maxPhyTime>0.1</maxPhyTime>
+				<totalPhyTime>0.0</totalPhyTime>
+			</physicalTimes>
+			<dualTimeStep>
+				<subIteration>
+					<maxSubStep>45</maxSubStep>
+					<minSubStep>40</minSubStep>
+				</subIteration>
+				<iterationMethod>Newton</iterationMethod>				<!-- Newton or pseudoTimeStepping-->
+				<newTimeStepInitialize>lastTime</newTimeStepInitialize>				<!-- lastTime or LagrangeExterpolation-->
+				<beginStep>5</beginStep>
+			</dualTimeStep>
+
+			<!-- (6) BDF. It is a dual time-step method. -->
+			<!--<timeMarching>BDF123LUSGS</timeMarching>-->
+			<BDF123LUSGS>
+				<BDF123>BDF3</BDF123>				<!-- BDF1、BDF2 or BDF3-->
+			</BDF123LUSGS>			
+
+			<sourceTermTreating>diagImpliciSource</sourceTermTreating>			<!-- explicitSource, diagImpliciSource or fullJacobian. Default is explicitSource. -->
+		</timeMethod>
+
+		<!--[1.6] Monitor. -->
+		<monitor>
+			<monitorList><![CDATA[residuals]]></monitorList>
+			<!--(1) Residuals. -->
+			<residuals>
+				<monitorType>residuals</monitorType>
+				<updateStep>1</updateStep>				
+				<writeToFile>off</writeToFile> 										<!-- On or off. Should write the information to the file. Default is off. -->
+				<fileName>HurricaneResidual.dat</fileName> 										<!-- Defalut is case name + "_residuals.dat".  -->
+				<varList><![CDATA[rho,v,E,O2,C2H4]]></varList>							<!-- Notice: if vector-type variables, the vector name is only valid while the name of every component of this vecotr is not essential-->
+				<residualConvergence>on</residualConvergence>        					<!-- On or off, default is off. -->
+				<rho>1e-6</rho>
+				<v>(1e-6,1e-6,1)</v>													<!-- Notice: if vector-type variables-->
+				<E>1e-6</E>
+				<O2>1e-6</O2>
+				<H2>1e-6</H2>
+			</residuals>
+		</monitor>
+
+	</iteration>
+
+	<!--[2] Spatial Scheme-->
+	<spatialScheme>
+		<!--[2.1] Flux-->
+			<spatialScheme>upwindSchemes</spatialScheme>		<!-- upwindSchemes, blendingSchemeTVDLimiter2, JST. -->
+			<upwindSchemes>
+				<upwindScheme>HLLC</upwindScheme>			<!--AUSMPWPlus, AUSMPlusUP, LDFSS2, HLLC, HLLC_HLL, AUSM, HLL, or vanLeer-->
+
+				<HLLC>
+					<lowMachCorrected>on</lowMachCorrected>				<!-- Default is off. -->
+					<enhancedShockStability>off</enhancedShockStability>				<!-- Default is off. -->
+				</HLLC>
+			</upwindSchemes>
+
+		<!--[2.2] Reconstruction-->
+		
+			<!--First order-->
+			<!--<reconstruction>firstOrder</reconstruction>-->
+
+			<!--Multi-Dimensional Linear Method-->
+			<reconstruction>linear</reconstruction>
+			<limitersForLinear>Venk</limitersForLinear>		<!-- Barth or Venk-->
+			<K>5.0</K>		<!-- Venk parameters. If Mach number is large, it is recommended to reduce K. -->
+		
+		<!--[2.3] Gradient-->
+			<gradient>cellGaussGrad</gradient>		<!-- nodeGaussGrad, leastSquareGrad or cellGaussGrad-->
+				<cellNeighbourCell>NODENEIGHBOUR</cellNeighbourCell>		<!-- FACENEIGHBOUR, NODENEIGHBOUR or TWOFACENEIGHBOUR-->
+	</spatialScheme>
+
+	<!--[3] Flow Setting-->
+	<flow>
+
+		<!--[3.1] Flow Model-->
+		<flowModel>laminarFlow</flowModel>		<!-- EulerFlow, laminarFlow or eddyViscosity-->
+		<Prl>0.72</Prl>		<!-- Laminar Prandtl number-->
+
+		<!--[3.3] Limits Setting-->
+		<limits>
+			<limitMethod>directly</limitMethod>			<!-- directly or average-->
+			<!--Temperature-->
+				<THigh>4400.0</THigh>
+				<TLow>100.0</TLow>
+			<!--Pressure-->
+				<pHigh>6.5e7</pHigh>
+				<pLow>4000.0</pLow>
+		</limits>
+
+		<!--[3.4] Species Setting-->
+		<mixture>
+			<equationOfState>perfectGas</equationOfState>
+			<chemical>reaction</chemical>			<!--singleSp, mixing or reaction-->
+
+			<maxSubStep>3</maxSubStep>			<!-- The maximum sub-steps for operator-splitting. Default is 3. -->
+			
+			<!--[3.4.1] Single Species-->
+			<!--<MW>28.97</MW>-->
+			
+			<thermo>
+				<type>JANAF</type> <!-- -->
+			</thermo>
+
+			<transport>
+				<type>kinetic</type>
+			</transport>
+
+			<mixtureFiles>
+				<chemFile>C2H4_7s3r.che</chemFile>
+				<thermoFile>thermo.dat</thermoFile>
+				<tansportFile>transport.dat</tansportFile>
+			</mixtureFiles>
+
+			<reactions>
+				<chemistryOption>integrated</chemistryOption>
+				<!-- Chemistry options include coupled, strangSplitted and integrated. Defalut is coupled. 
+				(1) Option "coupled" is valid for laminar finite rate, PaSR.
+				(2) Option "strangSplitted" is only valid for laminar finite rate.
+				(3) Option "integrated" is valid for laminar finite rate, PaSR model.
+				-->
+				<combustionModel>
+					<!--Turbulent combustion closure models:  finiteRate, PaSR-->
+					<!-- (1) Laminar finite rate. -->
+					<type>finiteRate</type>
+					<finiteRate>
+						<minDtFactor>0.1</minDtFactor>						<!-- The minimum factor to reduce the time step. Default is 0.1. -->
+						<tauIntFactor>0.1</tauIntFactor>
+					</finiteRate>
+					
+
+				</combustionModel>
+				<!-- <defineFuelAndOxygen> -->
+					<!-- <fuel><![CDATA[H2]]></fuel> -->
+					<!-- <fuelMassFraction> -->
+						<!-- <H2>1.0</H2> -->
+					<!-- </fuelMassFraction> -->
+
+					<!-- <oxygen><![CDATA[O2]]></oxygen> -->
+					<!-- <oxygenMassFraction> -->
+						<!-- <O2>0.232</O2> -->
+					<!-- </oxygenMassFraction> -->
+
+					<!-- <stoichiometricRatio>8</stoichiometricRatio> -->
+				<!-- </defineFuelAndOxygen> -->
+
+				<!-- <!-- Used for calculating tcGSPR, i.e. the characteristic chemical time scale using the approach based on the given species production rates--> -->
+				<!-- <defineProduction> -->
+					<!-- <![CDATA[H2O,CO2]]> -->
+				<!-- </defineProduction> -->
+
+				<chemistrySource>
+					<solver>
+						<ODEsSolver>RK23</ODEsSolver>		<!--Euler, RK23, RKF45 or BS23, ImplicitEuler, or BDF23, ImplicitTrapezoidal-->
+						<maxstep>10000</maxstep>						<!-- Default is 10000 -->
+						<atol>1e-11</atol>						<!-- Absolute tolerance. Default is 1e-15 -->
+						<rtol>1e-4</rtol>						<!-- Relative tolerance. Default is 1e-4 -->					
+					</solver>
+					<chemistrySource>chemistryODEs</chemistrySource>					<!-- chemistryODEs, chemistryNoSolver, CUDAChemistrySourceNoSolver-->
+
+					<chemicalMaxStep>1e10</chemicalMaxStep>					<!-- The maximum step for integrating chemical kinetics. -->
+					<simplifiedJacobians>off</simplifiedJacobians>
+
+					<solveOptions>
+						<TemperatureThreshold>200</TemperatureThreshold>						<!-- The minimum temperature for computing chemical reactions. Only works for "strangSplitted" and "integrated". Default is 200K. -->
+						<TemperatureAlpha>0.2</TemperatureAlpha>						<!-- Temperature positivity limit rate. Default is 0.2. -->
+						<TemperatureBeta>0.25</TemperatureBeta>						<!-- Temperature time step reduction. Default is 0.25. -->
+					</solveOptions>
+
+				</chemistrySource>				
+			</reactions>
+		</mixture>
+	</flow>
+
+
+	<!--[4] Boundary Condition-->
+	<boundaryCondition>
+
+		<!--[4.1] pressure-far-field or supersonic inlet boundary condition. -->
+		<INLET>
+			<bcType>detonationInlet</bcType>
+			<totalTemperature>300.0</totalTemperature>                            	<!-- Supersonic inlet static pressure or subsonic initial pressure. -->
+			<totalPressure>1013250</totalPressure>	
+			
+			<directionType>normalToBoundary</directionType>  
+			
+			<species>
+				<givenBy>massFraction</givenBy>
+				<CO2>0.0</CO2>
+                <C2H4>0.06364</C2H4>
+                <H2O>0.0</H2O>               
+                <O>0.0</O>
+                <O2>0.21818</O2>
+                <CO>0.0</CO>
+				<N2>0.71818</N2>
+			</species>
+        </INLET>
+		<!--[4.5] outflow -->
+        <OUT>
+			<bcType>outflow</bcType>
+			<p>101325</p><!---->													<!-- Note if the pressure is specified by this parameter, then the outlet pressure will be specified as the given value when the outlet face is subsonic. -->			
+        </OUT>
+		
+		<!--[4.7] Symmetry -->
+		<WALL>
+            <bcType>symmetry</bcType>
+        </WALL>
+		
+		<!--[4.8] periodic -->
+		
+		<PRIOID1>
+			<bcType>periodic</bcType>
+		</PRIOID1>
+
+		<periodic_sh>
+			<bcType>periodic</bcType>
+		</periodic_sh>
+	</boundaryCondition>
+
+
+	<!--[6] Initialization-->
+	<initialization>
+
+		<!--[6.1] Initialization Value-->
+		<!-- (1) Initialize from Specific Boundary-->
+		<initFromBoundary>INLET</initFromBoundary>
+
+		<!--(2) Initialize from Given Value-->
+			<!--[B] Initialize from Given Value-->
+			<initFromValue> <!-- -->
+				<v>(0,200,0)</v> <!-- -->
+				<p>202650</p> <!-- -->
+				<T>300</T> <!-- -->	
+				<CO2>0.2</CO2>
+				<C2H4>0.0</C2H4>
+				<H2O>0.08182</H2O>               
+				<O>0.0</O>
+				<O2>0.0</O2>
+				<CO>0.0</CO>
+				<N2>0.71818</N2>
+			</initFromValue> <!-- -->
+
+		<!-- [6.2] Patch Region-->
+		<initPatch>
+			<![CDATA[patch1,patch2,patch3]]>
+		</initPatch>	
+		
+		<patch1>
+			<region>region0</region>
+			<type>distributed</type>   														<!-- type : uniform or distributed -->
+			<patchVar>
+				<![CDATA[p,T,v]]>
+			</patchVar>	
+			<p>
+				<![CDATA[202650+279735000*[X]]]>
+			</p> 
+			<T>
+				<![CDATA[300+170000*[X]]]>
+			</T> 
+			<v>
+				<![CDATA[(180000*[X],0,0)]]>
+			</v>
+		</patch1>
+		
+		<patch2>
+			<region>region1</region>
+			<type>uniform</type>   														<!-- type : uniform or distributed -->
+			<patchVar>
+				<![CDATA[p,T,v]]>
+			</patchVar>		
+			<p>3000000</p>
+			<T>2000</T>
+			<v>(1800,0,0)</v>
+		</patch2>
+		
+		<patch3>
+			<region>region2</region>
+			<type>uniform</type>   														<!-- type : uniform or distributed -->
+			<patchVar>
+				<![CDATA[C2H4,O2,H2O,CO2]]>
+			</patchVar>		
+			<C2H4>0.06364</C2H4>
+			<O2>0.21818</O2>
+			<H2O>0.0</H2O>
+			<CO2>0.0</CO2>
+		</patch3>
+	</initialization>
+
+
+	<!--[7] Write Setting-->
+	<writeControl>
+		<solutionWrite>
+			<writeType>tecplot</writeType>
+			<solutionType>onlyInstantaneous</solutionType>
+			
+			<varList>
+				<![CDATA[rho,v,p,T,Ma,gamma,pt,pt_constCp,allSpecies,heatReleaseRate]]>   
+			</varList>
+		</solutionWrite>
+    </writeControl>
+</Config>
