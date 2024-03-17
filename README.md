@@ -133,8 +133,20 @@ If you have any problems in building or running the code or any suggestions, ple
  * **[A.P. Chen Bing](http://shi.buaa.edu.cn/chenbing/zh_CN/index.htm "A.P. Chen Bing")**. Email:<MarkChien@buaa.edu.cn>
  * **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")**. Email:<xuxu_1521@126.com>
 
+## Current Maintainer
+
+The OpenHurricane project is maintained by  
+
+* **Ph.D Candidates Rao Sihang** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:raosihang@hotmail.com
+* **Ph.D Candidates Peng Jian** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:p308224999@outlook.com
+* **Ph.D Candidates Yang Hongzhen** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:826134437@qq.com
+* **Zhang Jiebo** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+* **Zheng Putian** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+* **Qin Xu** of **[Prof. Xu Xu](http://www.sa.buaa.edu.cn/info/1013/4720.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+
+
 ## License
 
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html "GNU General Public License version 3")
 
-Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University   
+Copyright (C) 2019-2024, Prof. Xu Xu's group at Beihang University   
