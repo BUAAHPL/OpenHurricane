@@ -7,7 +7,7 @@
  * \date 2022.05.02
  *
  * OpenHurricane: Open parts of Hurricane project (Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation)
- * \copyright Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.
+ * \copyright Copyright (C) 2019-2024, Prof. Xu Xu's group at Beihang University.
  *
  * License
  *		This file is part of OpenHurricane
@@ -126,24 +126,68 @@ template <class timeMethod> inline void OpenHurricane::BDF123<timeMethod>::initi
 template <class timeMethod> inline void OpenHurricane::BDF123<timeMethod>::updateOld() {
     if (timeMethod::iter().cStep() <= alphaSize_ - 1) {
         if (timeMethod::iter().restartFromUnsteady()) {
-            setAlpha(type_);
+            if (timeMethod::iter().nTimeGroups() < 4 || timeMethod::iter().isInterpolation()) {
+                if (type_ == BDF1) {
+                    setAlpha(type_);
+                } else if (type_ == BDF2) {
+                    if (timeMethod::iter().cStep() == 1) {
+                        setAlpha(BDF1);
+
+                        /*alpha_[0] = 1.0;
+                        alpha_[1] = -1.0;
+                        alpha_[2] = 0.0;*/
+                    } else {
+                        setAlpha(type_);
+                    }
+                } else if (type_ == BDF3) {
+                    if (timeMethod::iter().cStep() == 1) {
+                        setAlpha(BDF1);
+                        /*alpha_[0] = 1.0;
+                        alpha_[1] = -1.0;
+                        alpha_[2] = 0.0;
+                        alpha_[3] = 0.0;*/
+                    } else if (timeMethod::iter().cStep() == 2) {
+                        setAlpha(BDF2);
+                        /*alpha_[0] = 1.5;
+                        alpha_[1] = -2.0;
+                        alpha_[2] = 0.5;
+                        alpha_[3] = 0.0;*/
+                    } else {
+                        setAlpha(type_);
+                    }
+                }
+            } else {
+                setAlpha(type_);
+            }
         } else if (type_ == BDF2) {
             if (timeMethod::iter().cStep() == 1) {
                 setAlpha(BDF1);
 
+                /*alpha_[0] = 1.0;
+                alpha_[1] = -1.0;
+                alpha_[2] = 0.0;*/
             } else {
                 setAlpha(type_);
             }
         } else if (type_ == BDF3) {
             if (timeMethod::iter().cStep() == 1) {
                 setAlpha(BDF1);
+                /*alpha_[0] = 1.0;
+                alpha_[1] = -1.0;
+                alpha_[2] = 0.0;
+                alpha_[3] = 0.0;*/
             } else if (timeMethod::iter().cStep() == 2) {
                 setAlpha(BDF2);
+                /*alpha_[0] = 1.5;
+                alpha_[1] = -2.0;
+                alpha_[2] = 0.5;
+                alpha_[3] = 0.0;*/
             } else {
                 setAlpha(type_);
             }
         }
-    } else {
+    } else //if (timeMethod::iter().pTStep().isDynamicTimeStep())
+    {
         setAlpha(type_);
     }
 
@@ -488,13 +532,63 @@ inline void OpenHurricane::BDF123<timeMethod>::setBDFType(const controller &time
 
 template <class timeMethod> inline void OpenHurricane::BDF123<timeMethod>::updateDyPhyTimeStep() {
     if (timeMethod::iter().restartFromUnsteady()) {
-        if (timeMethod::iter().pTStep().isDynamicTimeStep()) {
-            timeMethod::calcFluxSpectRadius();
+        if (timeMethod::iter().nTimeGroups() < 4 || timeMethod::iter().isInterpolation()) {
+            if (useLinearDtCFL_) {
+                const auto cstep = timeMethod::iter().cStep();
+                if (timeMethod::iter().pTStep().isDynamicTimeStep()) {
+                    timeMethod::calcFluxSpectRadius();
 
-            const_cast<iteration &>(timeMethod::iter())
-                .pTStep()
-                .setTimeStep(timeMethod::pseudoTimes().getGlobalTimeStep(
-                    timeMethod::iter().pTStep().dyCFL()));
+                    if (cstep == 0) {
+                        dtCFL0_ = 0.1 * timeMethod::iter().pTStep().dyCFL();
+                    }
+
+                    if (cstep <= dtCFLConst_) {
+                        const_cast<iteration &>(timeMethod::iter())
+                            .pTStep()
+                            .setTimeStep(timeMethod::pseudoTimes().getGlobalTimeStep(dtCFL0_));
+                    } else if (cstep <= dtCFLLinear_) {
+                        real CFL1 = dtCFL0_ + 0.9 * timeMethod::iter().pTStep().dyCFL() *
+                                                  fabs(real(cstep) - real(dtCFLConst_)) /
+                                                  max(real(1.0),
+                                                      fabs(real(dtCFLLinear_) - real(dtCFLConst_)));
+                        CFL1 = min(CFL1, timeMethod::iter().pTStep().dyCFL());
+                        const_cast<iteration &>(timeMethod::iter())
+                            .pTStep()
+                            .setTimeStep(timeMethod::pseudoTimes().getGlobalTimeStep(CFL1));
+                    } else {
+                        const_cast<iteration &>(timeMethod::iter())
+                            .pTStep()
+                            .setTimeStep(timeMethod::pseudoTimes().getGlobalTimeStep(
+                                timeMethod::iter().pTStep().dyCFL()));
+                    }
+                } else {
+                    if (cstep == 0) {
+                        dtCFL0_ = 0.1 * timeMethod::iter().pTStep().pTimeStep();
+                        dtFinal_ = timeMethod::iter().pTStep().pTimeStep();
+                    }
+
+                    if (cstep <= dtCFLConst_) {
+                        const_cast<iteration &>(timeMethod::iter()).pTStep().setTimeStep(dtCFL0_);
+                    } else if (cstep <= dtCFLLinear_) {
+                        real dt0 = dtCFL0_ +
+                                   0.9 * dtFinal_ * fabs(real(cstep) - real(dtCFLConst_)) /
+                                       max(real(1.0), fabs(real(dtCFLLinear_) - real(dtCFLConst_)));
+                        dt0 = min(dt0, dtFinal_);
+                        const_cast<iteration &>(timeMethod::iter()).pTStep().setTimeStep(dt0);
+                    } else if (cstep <= dtCFLLinear_ + 1) {
+                        const_cast<iteration &>(timeMethod::iter()).pTStep().setTimeStep(dtFinal_);
+                    }
+                }
+            }
+        } else {
+            if (timeMethod::iter().pTStep().isDynamicTimeStep()) {
+                timeMethod::calcFluxSpectRadius();
+
+                const_cast<iteration &>(timeMethod::iter())
+                    .pTStep()
+                    .setTimeStep(timeMethod::pseudoTimes().getGlobalTimeStep(
+                        timeMethod::iter().pTStep().dyCFL()));
+            }
         }
     } else {
         if (useLinearDtCFL_) {

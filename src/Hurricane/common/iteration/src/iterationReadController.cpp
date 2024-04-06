@@ -6,7 +6,7 @@
  * \date 2022.05.02
  *
  * OpenHurricane: Open parts of Hurricane project (Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation)
- * \copyright Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.
+ * \copyright Copyright (C) 2019-2024, Prof. Xu Xu's group at Beihang University.
  *
  * License
  *		This file is part of OpenHurricane
@@ -199,6 +199,10 @@ void OpenHurricane::iteration::getSubIterationStep(const controller &interCont) 
 
 void OpenHurricane::iteration::getRestartFrom(const controller &interCont) {
     if (interCont.found("restartFrom")) {
+        if (interCont.found("relayType")) {
+            isInterpolation_ = controllerSwitch(interCont)("relayType", isInterpolation_,
+                                                           "interpolationData", "originData");
+        }
         restart_ = true;
         restartFrom_ = interCont.findWord("restartFrom");
         if (!restartFrom_.isAbsolute()) {

@@ -7,7 +7,7 @@
  * \date 2022.05.02
  *
  * OpenHurricane: Open parts of Hurricane project (Highly Universal Rocket & Ramjet sImulation Codes for ANalysis and Evaluation)
- * \copyright Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.
+ * \copyright Copyright (C) 2019-2024, Prof. Xu Xu's group at Beihang University.
  *
  * License
  *		This file is part of OpenHurricane
@@ -135,6 +135,9 @@ namespace OpenHurricane {
         bool restart_;
         bool restartFromUnsteady_;
         fileName restartFrom_;
+
+        integer nTimeGroups_;
+        bool isInterpolation_;
 
     public:
         hur_nodiscard inline bool restart() const noexcept;
@@ -353,6 +356,12 @@ namespace OpenHurricane {
 
         iteration &operator++() noexcept;
         inline iteration &operator++(int) noexcept { return operator++(); }
+
+        inline void setNTimeGroups(const integer nTimeGroups) noexcept;
+
+        hur_nodiscard inline integer nTimeGroups() const noexcept;
+
+        hur_nodiscard inline bool isInterpolation() const noexcept { return isInterpolation_; }
     };
 } // namespace OpenHurricane
 

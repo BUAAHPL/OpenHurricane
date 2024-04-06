@@ -1,6 +1,6 @@
 GNU GENERAL PUBLIC LICENSE
 
-OpenHurricane is Copyright (C) 2019-2023, Prof. Xu Xu's group at Beihang University.
+OpenHurricane is Copyright (C) 2019-2024, Prof. Xu Xu's group at Beihang University.
 
  You may use, distribute and copy the OpenHurricane under the terms
  of GNU General Public License version 3, which is displayed below, or
