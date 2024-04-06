@@ -343,9 +343,16 @@ OpenHurricane::real OpenHurricane::BDF23::NewtonIteration(const real t0, const r
             real diver = maxErr / max(lastErr, tiny);
 
             // The iteration is diverging if diver > 2
-            if (diver > 2) {
-                isConvergence = false;
-                return 1000.0;
+            if (isAutoUpdateJacobian_) {
+                if (diver > 2 && count > max(3 * stepToUpdateJac_, 5)) {
+                    isConvergence = false;
+                    return 1000.0;
+                }
+            } else {
+                if (diver > 2 && count > 5) {
+                    isConvergence = false;
+                    return 1000.0;
+                }
             }
         }
         lastErr = maxErr;
@@ -399,6 +406,11 @@ void OpenHurricane::BDF23::adaptiveSolve(real &t, real &dt0, realArray &y) {
         if (!checkNewY(dt, y, yTemp_) && count < 100) {
             count++;
             error = 2;
+            real scale = max(safeScale_ * pow(error, -alphaInc_), minScale_);
+            dt *= scale;
+            if (dt <= veryTiny) {
+                errorAbortStr(("step size underflow: " + toString(dt)));
+            }
             continue;
         }
         if (lastError < error && (error < 5)) {

@@ -216,9 +216,16 @@ OpenHurricane::real OpenHurricane::ImplicitTrapezoidal::NewtonIteration(const re
             real diver = maxErr / max(lastErr, tiny);
 
             // The iteration is diverging if diver > 2
-            if (diver > 2) {
-                isConvergence = false;
-                return 1000.0;
+            if (isAutoUpdateJacobian_) {
+                if (diver > 2 && count > max(3 * stepToUpdateJac_, 5)) {
+                    isConvergence = false;
+                    return 1000.0;
+                }
+            } else {
+                if (diver > 2 && count > 5) {
+                    isConvergence = false;
+                    return 1000.0;
+                }
             }
         }
         lastErr = maxErr;
