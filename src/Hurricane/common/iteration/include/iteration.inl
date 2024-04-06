@@ -79,6 +79,14 @@ inline OpenHurricane::integer OpenHurricane::iteration::setTotalStep(const integ
     return tmpTS;
 }
 
+inline void OpenHurricane::iteration::setNTimeGroups(const integer nTimeGroups) noexcept {
+    nTimeGroups_ = nTimeGroups;
+}
+
+hur_nodiscard inline OpenHurricane::integer OpenHurricane::iteration::nTimeGroups() const noexcept {
+    return nTimeGroups_;
+}
+
 hur_nodiscard inline OpenHurricane::integer OpenHurricane::iteration::writeOutputStep() const noexcept {
     return writeOutputStep_;
 }

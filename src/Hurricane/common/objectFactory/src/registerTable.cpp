@@ -534,7 +534,7 @@ void OpenHurricane::registerTable::writeRelay(hdf5O &fos, const bool writeLast,
         if (!writeToGroup) {
             fos.writeIntegerAttributeToFile(0, "nTimeGroups");
         } else if (!writeLast) {
-            fos.writeIntegerAttributeToFile(1, "nTimeGroups");
+            fos.writeIntegerAttributeToFile(0, "nTimeGroups");
             string groupName = "timeGroup";
             groupName += toString(0);
             fos.createGroup(groupName);

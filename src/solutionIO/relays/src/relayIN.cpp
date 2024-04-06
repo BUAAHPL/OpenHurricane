@@ -67,7 +67,10 @@ void OpenHurricane::relayIN::readRelay(const hdf5I &fos, const fileName &restart
     auto fileDataTime = getStringAttributeFromFile(fos, attN::dateTime);
     auto meshFile = getStringAttributeFromFile(fos, attN::meshFile);
 
+    auto nTimeGroups = getIntegerAttributeFromFile(fos, attN::nTimeGroups);
+
     iter_.setTotalStep(totalStep);
+    iter_.setNTimeGroups(nTimeGroups);
 
     if (state != 0) {
         getPhysicalTimeInfoFromFile(fos);
@@ -77,13 +80,13 @@ void OpenHurricane::relayIN::readRelay(const hdf5I &fos, const fileName &restart
     bool readFromGroup = false;
     integer ng = getIntegerAttributeFromFile(fos, attN::nTimeGroups);
 
-    if (ng > 0) {
+    if (state != 0) {
         readFromGroup = true;
     }
     bool readLast = false;
     if (state != 0) {
         steadyOrUnsteady_ = true;
-        readLast = iter_.isReadLastFromRelay();
+        readLast = iter_.isReadLastFromRelay() && (ng > 0);
     }
     if (!isInterpolation_) {
         createIndexMap(fos);

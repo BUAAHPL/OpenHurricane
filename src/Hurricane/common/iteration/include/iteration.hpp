@@ -136,6 +136,9 @@ namespace OpenHurricane {
         bool restartFromUnsteady_;
         fileName restartFrom_;
 
+        integer nTimeGroups_;
+        bool isInterpolation_;
+
     public:
         hur_nodiscard inline bool restart() const noexcept;
         hur_nodiscard inline bool restartFromUnsteady() const noexcept;
@@ -353,6 +356,12 @@ namespace OpenHurricane {
 
         iteration &operator++() noexcept;
         inline iteration &operator++(int) noexcept { return operator++(); }
+
+        inline void setNTimeGroups(const integer nTimeGroups) noexcept;
+
+        hur_nodiscard inline integer nTimeGroups() const noexcept;
+
+        hur_nodiscard inline bool isInterpolation() const noexcept { return isInterpolation_; }
     };
 } // namespace OpenHurricane
 

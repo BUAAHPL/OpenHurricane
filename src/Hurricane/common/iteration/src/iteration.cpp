@@ -47,7 +47,8 @@ OpenHurricane::iteration::iteration(const char *_c, const argParse &arg)
     : registerTable(*this), cont_(_c), name_(_c), myMonitorPtr_(nullptr), solWritePtr_(nullptr),
       writeFaceZonePtr_(nullptr), isResConvergence_(false), cStep_(0), maxStep_(10000000),
       totalStep_(0), writeOutputStep_(500), restart_(false), restartFromUnsteady_(false),
-      restartFrom_(), pTStepPtr_(nullptr), subIterPtr_(nullptr), refValues_(),
+      restartFrom_(), nTimeGroups_(0), isInterpolation_(false), pTStepPtr_(nullptr),
+      subIterPtr_(nullptr), refValues_(),
       flowState_(flowStateType::steady), timestepType_(timestepType::localTimeStep),
       readLastFromRelay_(false), writeLastToRelay_(false) {
     readCont();
@@ -57,7 +58,8 @@ OpenHurricane::iteration::iteration(const char *_c, const argParse &arg, const s
     : registerTable(*this), cont_(_c), name_(_c), myMonitorPtr_(nullptr), solWritePtr_(nullptr),
       writeFaceZonePtr_(nullptr), isResConvergence_(false), cStep_(0), maxStep_(10000000),
       totalStep_(0), writeOutputStep_(500), restart_(false), restartFromUnsteady_(false),
-      restartFrom_(), pTStepPtr_(nullptr), subIterPtr_(nullptr), refValues_(),
+      restartFrom_(), nTimeGroups_(0), isInterpolation_(false), pTStepPtr_(nullptr),
+      subIterPtr_(nullptr), refValues_(),
       flowState_(flowStateType::steady), timestepType_(timestepType::localTimeStep),
       readLastFromRelay_(false), writeLastToRelay_(false) {
     readCont(contStr);

@@ -199,6 +199,10 @@ void OpenHurricane::iteration::getSubIterationStep(const controller &interCont) 
 
 void OpenHurricane::iteration::getRestartFrom(const controller &interCont) {
     if (interCont.found("restartFrom")) {
+        if (interCont.found("relayType")) {
+            isInterpolation_ = controllerSwitch(interCont)("relayType", isInterpolation_,
+                                                           "interpolationData", "originData");
+        }
         restart_ = true;
         restartFrom_ = interCont.findWord("restartFrom");
         if (!restartFrom_.isAbsolute()) {
