@@ -173,11 +173,11 @@ OpenHurricane::real OpenHurricane::BDF23::solve(const real t0, const realArray &
     yk_ = y0;
     bool isConvergence = true;
     auto errorN = NewtonIteration(t0, y, dydt0, dt, yk_, isConvergence);
+
+    y = yk_;
     if (!isConvergence) {
         return errorN;
     }
-
-    y = yk_;
 
     if (countJacStep_ <= iOrder_) {
         realArray err00(y0.size(), Zero);
@@ -344,7 +344,7 @@ OpenHurricane::real OpenHurricane::BDF23::NewtonIteration(const real t0, const r
 
             // The iteration is diverging if diver > 2
             if (isAutoUpdateJacobian_) {
-                if (diver > 2 && count > max(3 * stepToUpdateJac_, 5)) {
+                if (diver > 2 && count > max(30 * stepToUpdateJac_, 50)) {
                     isConvergence = false;
                     return 1000.0;
                 }
@@ -406,8 +406,7 @@ void OpenHurricane::BDF23::adaptiveSolve(real &t, real &dt0, realArray &y) {
         if (!checkNewY(dt, y, yTemp_) && count < 100) {
             count++;
             error = 2;
-            real scale = max(safeScale_ * pow(error, -alphaInc_), minScale_);
-            dt *= scale;
+            
             if (dt <= veryTiny) {
                 errorAbortStr(("step size underflow: " + toString(dt)));
             }

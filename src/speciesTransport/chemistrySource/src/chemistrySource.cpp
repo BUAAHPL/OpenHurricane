@@ -1151,11 +1151,11 @@ void OpenHurricane::chemistrySource::jacobianSelected(const real t, const realAr
 
 bool OpenHurricane::chemistrySource::checkNewY(real &dt, const realArray &yOld, const realArray &yNew) {
     if ((yNew.last() - yOld.last()) > TemperatureAlpha_ * yOld.last()) {
-        if (dt < tiny) {
+       /* if (dt < tiny) {
             errorAbortStr(("Timestep size if too small: " + toString(dt) +
                            ". And initial temperature is " + toString(yOld.last()) +
                            ", while new temperature is " + toString(yNew.last())));
-        }
+        }*/
         dt *= TemperatureBeta_;
 
         return false;

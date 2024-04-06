@@ -102,11 +102,12 @@ OpenHurricane::real OpenHurricane::ImplicitTrapezoidal::solve(const real t0, con
     yk_ = y0;
     bool isConvergence = true;
     auto errorN = NewtonIteration(t0, y0, dydt0, dt, yk_, isConvergence);
+
+    y = yk_;
     if (!isConvergence) {
         return errorN;
     }
 
-    y = yk_;
     if (countStep_ == 0) {
         realArray err00(y0.size(), Zero);
         DyDt(t0 + dt, yk_, dydt_);
@@ -217,7 +218,7 @@ OpenHurricane::real OpenHurricane::ImplicitTrapezoidal::NewtonIteration(const re
 
             // The iteration is diverging if diver > 2
             if (isAutoUpdateJacobian_) {
-                if (diver > 2 && count > max(3 * stepToUpdateJac_, 5)) {
+                if (diver > 2 && count > max(30 * stepToUpdateJac_, 50)) {
                     isConvergence = false;
                     return 1000.0;
                 }
@@ -264,6 +265,15 @@ void OpenHurricane::ImplicitTrapezoidal::adaptiveSolve(real &t, real &dt0, realA
         lastTimeStep_[0] = dt;
         error = solve(t, y, dydt0, dt, yTemp_);
 
+        if (!checkNewY(dt, y, yTemp_) && count < 100) {
+            error = 2;
+            count++;
+
+            if (dt <= veryTiny) {
+                errorAbortStr(("step size underflow: " + toString(dt)));
+            }
+            continue;
+        }
         if (error > 1.0) {
             real scale = max(safeScale_ * pow(error, -alphaInc_), minScale_);
             dt *= scale;

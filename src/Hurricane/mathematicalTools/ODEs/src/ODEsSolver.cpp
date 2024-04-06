@@ -163,6 +163,9 @@ void OpenHurricane::ODEsSolver::adaptiveSolve(real &t, real &dt0, realArray &y) 
         error = solve(t, y, dydt0, dt, yTemp_);
         if (!checkNewY(dt, y, yTemp_)) {
             error = 2;
+            if (dt <= veryTiny) {
+                errorAbortStr(("step size underflow: " + toString(dt)));
+            }
             continue;
         }
         if (error > 1.0) {
