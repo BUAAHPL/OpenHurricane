@@ -44,7 +44,8 @@ void OpenHurricane::JANAFThermoParsing::parseAllThermoData(thermoList &th) {
             i += 3;
         } else if (!std::regex_match(therML[i], emptyT) &&
                    !std::regex_match(therML[i], globalTRegex)) {
-            errorAbortStr(("Unmatched: " + therML[i]));
+            errorAbortStr(("Unmatched: \n" + therML[i] + "\n" + therML[i + 1] + "\n" +
+                           therML[i + 2] + "\n" + therML[i + 3]));
         }
     }
 }

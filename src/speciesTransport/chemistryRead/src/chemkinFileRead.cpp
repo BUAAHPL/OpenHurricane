@@ -1034,7 +1034,7 @@ bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(std::stri
             checkWarning("The species acting as the third body are not the same.");
         } else {
 
-            if (whatStr[0] == "M") {
+            if (whatStr[0] == "M" || whatStr[0] == "m") {
                 reacStr = std::regex_replace(reacStr, pressureDependentRegex, "");
                 id = -1;
             } else {
@@ -1064,7 +1064,7 @@ bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(std::stri
 
 bool OpenHurricane::chemkinFileRead::checkAndReplaceThirdbody(std::string &reacStr,
                                                           realArray &efficiences) const {
-    const std::regex thirdBodyRegex("\\+\\s*?M");
+    const std::regex thirdBodyRegex("\\+\\s*?(?:M|m)");
     std::string::const_iterator start = reacStr.begin();
     std::string::const_iterator end = reacStr.end();
     integer count = Zero;
@@ -1161,6 +1161,7 @@ OpenHurricane::stringList OpenHurricane::chemkinFileRead::parsingElements() {
             start = matchs[0].second;
         }
     }
+    uniqueStringList(tempEle);
 
     specTable_.elementsNameList() = tempEle;
 
@@ -1185,6 +1186,7 @@ OpenHurricane::stringList OpenHurricane::chemkinFileRead::parsingSpecies() {
         tempSp.append(string(matchs[0]));
         start = matchs[0].second;
     }
+    uniqueStringList(tempSp);
 
     specTable_.resize(tempSp.size());
     for (integer i = 0; i < tempSp.size(); ++i) {
