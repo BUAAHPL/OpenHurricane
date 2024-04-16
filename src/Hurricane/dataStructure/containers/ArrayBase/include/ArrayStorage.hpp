@@ -472,8 +472,9 @@ namespace OpenHurricane {
          * \brief Insert an element at the entry specified by iter of the array.
          * \param[in] iter - The entry where to insert.
          * \param[in] elem - The value to be inserted.
+         * \return Pointer pointing to the inserted elem.
          */
-        void insert(const value_type *iter, const value_type &elem) {
+        value_type *insert(const value_type *iter, const value_type &elem) {
             if ((iter > &element_[size_]) || (iter < &element_[0])) {
                 LFatal("Beyond the size, please check!");
             }
@@ -483,16 +484,20 @@ namespace OpenHurricane {
             value_type *oldElem = &element_[0];
             value_type *newElem = &tmpArray.element_[0];
             size_type i = size_;
+            value_type *newIter = oldElem;
             while (i--) {
                 if (oldElem == iter) {
+                    newIter = newElem;
                     *newElem++ = elem;
                 }
                 *newElem++ = *oldElem++;
             }
             if (iter == &element_[size_]) {
+                newIter = newElem;
                 *newElem++ = elem;
             }
             this->swap(tmpArray);
+            return newIter;
         }
 
         /**
@@ -500,8 +505,9 @@ namespace OpenHurricane {
          * \param[in] iter - The entry where to insert.
          * \param[in] num - Specify the total number to be insert.
          * \param[in] elem - The value to be inserted.
+         * \return Pointer pointing to the first element inserted.
          */
-        void insert(const value_type *iter, const size_type num, const value_type &elem) {
+        value_type *insert(const value_type *iter, const size_type num, const value_type &elem) {
             if (num >= 1) {
                 if ((iter > &element_[size_]) || (iter < &element_[0])) {
                     LFatal("Beyond the size, please check!");
@@ -511,10 +517,14 @@ namespace OpenHurricane {
 
                 value_type *oldElem = &element_[0];
                 value_type *newElem = &tmpArray.element_[0];
+                value_type *newIter = oldElem;
                 size_type i = size_;
                 while (i--) {
                     if (oldElem == iter) {
                         for (size_type j = 0; j < num; j++) {
+                            if (j == 0) {
+                                newIter = newElem;
+                            }
                             *newElem++ = elem;
                         }
                     }
@@ -522,11 +532,16 @@ namespace OpenHurricane {
                 }
                 if (iter == &element_[size_]) {
                     for (size_type j = 0; j < num; j++) {
+                        if (j == 0) {
+                            newIter = newElem;
+                        }
                         *newElem++ = elem;
                     }
                 }
                 this->swap(tmpArray);
+                return newIter;
             }
+            return const_cast<value_type *>(iter);
         }
     };
 

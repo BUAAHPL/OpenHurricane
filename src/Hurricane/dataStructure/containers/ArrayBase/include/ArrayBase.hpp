@@ -556,9 +556,10 @@ namespace OpenHurricane {
          * \brief Insert an element at the entry specified by iter of the Array. Only for dynamic Array.
          * \param[in] iter - The entry where to insert.
          * \param[in] elem - The value to be inserted.
+         * \return Iterator pointing to the inserted elem.
          */
-        inline void insert(const_iterator iter, const value_type &elem) {
-            mData_.insert(iter, elem);
+        inline iterator insert(const_iterator iter, const value_type &elem) {
+            return mData_.insert(iter, elem);
         }
 
         /**
@@ -566,47 +567,60 @@ namespace OpenHurricane {
          * \param[in] iter - The entry where to insert.
          * \param[in] num - Specify the total number to be insert.
          * \param[in] elem - The value to be inserted.
+         * \return Iterator pointing to the first element inserted.
          */
-        inline void insert(const_iterator iter, const size_type num, const value_type &elem) {
-            mData_.insert(iter, num, elem);
+        inline iterator insert(const_iterator iter, const size_type num, const value_type &elem) {
+            return mData_.insert(iter, num, elem);
         }
 
         /**
          * \brief Insert an Array at the entry specified by iter of the Array. Only for dynamic Array.
          * \param[in] iter - The entry where to insert.
          * \param[in] arr - The Array to be insert.
+         * \return Iterator pointing to the first element inserted.
          */
-        inline void insert(const_iterator iter, const ArrayDyn<value_type, sizeType> &arr) {
+        inline iterator insert(const_iterator iter, const ArrayDyn<value_type, sizeType> &arr) {
             if ((iter > this->end()) || (iter < this->begin())) {
                 LFatal("Beyond the size, please check!");
             }
-            size_type newSize = this->size() + arr.size();
-            Base tmpArray(newSize, max(this->capacity(), newSize));
+            if (arr.size() > 0) {
+                size_type newSize = this->size() + arr.size();
+                Base tmpArray(newSize, max(this->capacity(), newSize));
 
-            value_type *oldElem = mData_.data();
-            value_type *newElem = tmpArray.data();
-            size_type i = this->size();
-            while (i--) {
-                if (oldElem == iter) {
+                value_type *oldElem = mData_.data();
+                value_type *newElem = tmpArray.data();
+                size_type i = this->size();
+                iterator newIter = begin();
+                while (i--) {
+                    if (oldElem == iter) {
+                        for (size_type j = 0; j < arr.size(); j++) {
+                            if (j == 0) {
+                                newIter = newElem;
+                            }
+                            *newElem++ = arr[j];
+                        }
+                    }
+                    *newElem++ = *oldElem++;
+                }
+                if (iter == this->end()) {
                     for (size_type j = 0; j < arr.size(); j++) {
+                        if (j == 0) {
+                            newIter = newElem;
+                        }
                         *newElem++ = arr[j];
                     }
                 }
-                *newElem++ = *oldElem++;
+                mData_.swap(tmpArray);
+                return newIter;
             }
-            if (iter == this->end()) {
-                for (size_type j = 0; j < arr.size(); j++) {
-                    *newElem++ = arr[j];
-                }
-            }
-            mData_.swap(tmpArray);
+            return const_cast<iterator>(iter);
         }
 
         /**
          * \brief Erase an element at the entry specified by iter of the Array. Only for dynamic Array.
          * \param[in] iter - The entry where to erase.
          */
-        inline void erase(const_iterator iter) {
+        inline iterator erase(const_iterator iter) {
             if ((iter > this->end()) || (iter < this->begin())) {
                 LFatal("Beyond the size, please check!");
             }
@@ -616,17 +630,32 @@ namespace OpenHurricane {
             value_type *oldElem = mData_.data();
             value_type *newElem = tmpArray.data();
             size_type i = this->size();
+            bool erased = false;
+            bool isEnd = false;
+            iterator nextIter = begin();
             while (i--) {
-                if (oldElem == iter) {
+                if (oldElem == iter && !erased) {
                     oldElem++;
                     i--;
+                    erased = true;
                 }
                 if (i < 0) {
+                    if (erased) {
+                        isEnd = true;
+                    }
                     break;
+                }
+                if (erased) {
+                    nextIter = newElem;
+                    erased = false;
                 }
                 *newElem++ = *oldElem++;
             }
             mData_.swap(tmpArray);
+            if (isEnd) {
+                nextIter = this->end();
+            }
+            return nextIter;
         }
 
         /**
@@ -634,7 +663,7 @@ namespace OpenHurricane {
          * \param[in] iter - The entry where to erase.
          * \param[in] num - The number of elements to be erase.
          */
-        inline void erase(const_iterator iter, const size_type num) {
+        inline iterator erase(const_iterator iter, const size_type num) {
             if ((iter > this->end()) || (iter < this->begin())) {
                 LFatal("Beyond the size, please check!");
             }
@@ -644,19 +673,33 @@ namespace OpenHurricane {
             value_type *oldElem = mData_.data();
             value_type *newElem = tmpArray.data();
             size_type i = this->size();
+            bool erased = false;
+            bool isEnd = false;
+            iterator nextIter = begin();
             while (i--) {
-                if (oldElem == iter) {
+                if (oldElem == iter && !erased) {
                     for (size_type j = 0; j < num; j++) {
                         oldElem++;
                         i--;
                     }
                 }
                 if (i < 0) {
+                    if (erased) {
+                        isEnd = true;
+                    }
                     break;
+                }
+                if (erased) {
+                    nextIter = newElem;
+                    erased = false;
                 }
                 *newElem++ = *oldElem++;
             }
             mData_.swap(tmpArray);
+            if (isEnd) {
+                nextIter = this->end();
+            }
+            return nextIter;
         }
 
         /**
