@@ -54,5 +54,21 @@ namespace OpenHurricane {
             }
         }
 
+        /**
+         * \brief Reverse Box-Cox data transformation.
+         * \param[in] bx - Transformed data to be reversed.
+         */
+        hur_nodiscard inline real reverseBoxCox(const real bx, const real lambda) {
+            if (lambda == 0) {
+                return exp(bx);
+            } else if (lambda == 1) {
+                return bx + 1.0;
+            } else if (lambda == 2) {
+                return sqrt(max(real(2) * bx + 1.0, Zero));
+            } else {
+                return pow(max(lambda * bx + 1, Zero), inv(lambda));
+            }
+        }
+
     } // namespace dataTransformations
 } //  namespace OpenHurricane
