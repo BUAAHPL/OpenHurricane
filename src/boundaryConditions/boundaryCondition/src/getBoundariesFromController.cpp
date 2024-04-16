@@ -623,7 +623,7 @@ void OpenHurricane::getBoundariesFromController::getMassFlowInlet(const mixture 
     if (mixtures.species().size() > 1) {
         for (integer isp = 0; isp < mixtures.species().size(); ++isp) {
             bcCont.add(mixtures.species()[isp].name() + "bcType",
-                       string("fixedValueExtrapolate"));
+                       string("fixedValue"));
         }
     }
 }
@@ -799,7 +799,7 @@ void OpenHurricane::getBoundariesFromController::getWallCondition(const mixture 
             getSpeciesMassFractions(bcCont, mixtures, true);
             for (integer isp = 0; isp < species.size(); ++isp) {
                 bcCont.add(species[isp].name() + "bcType",
-                           string("fixedValueExtrapolate"));
+                           string("fixedValue"));
             }
         } else {
             LFatal("Unknown species condition type: %s in face zone: %s", speciesCondition.c_str(),
