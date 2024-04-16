@@ -30,6 +30,19 @@
 #include "Lists.hpp"
 #include <filesystem>
 #include <fstream>
+#include <set>
+
+void OpenHurricane::uniqueStringList(stringList &str) {
+    std::set<string> ses;
+    for (stringList::iterator iter = str.begin(); iter != str.end();) {
+        auto retu = ses.emplace(*iter);
+        if (!retu.second) {
+            iter = str.erase(iter);
+            continue;
+        }
+        iter++;
+    }
+}
 
 const OpenHurricane::fileName OpenHurricane::fileName::null;
 

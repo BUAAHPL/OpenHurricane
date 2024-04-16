@@ -34,6 +34,8 @@ namespace OpenHurricane {
     template <class T> class List;
     typedef List<string> stringList;
 
+     void uniqueStringList(stringList &str);
+
     class fileName {
     public:
         using value_type = char;
