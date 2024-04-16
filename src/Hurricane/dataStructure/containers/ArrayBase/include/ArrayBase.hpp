@@ -662,6 +662,7 @@ namespace OpenHurricane {
          * \brief Erase num elements at the entry specified by iter of the Array. Only for dynamic Array.
          * \param[in] iter - The entry where to erase.
          * \param[in] num - The number of elements to be erase.
+         * \return Iterator following the last removed element.
          */
         inline iterator erase(const_iterator iter, const size_type num) {
             if ((iter > this->end()) || (iter < this->begin())) {
