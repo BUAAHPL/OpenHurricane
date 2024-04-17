@@ -159,11 +159,11 @@ OpenHurricane::calculateFaceZoneVar::wallFaceZoneHeatFlux(const flowModel &flow,
     const auto &fC = flow.mesh().faceCentre();
     const auto &cC = flow.mesh().cellCentre();
     if (!fZL[zoneId].isWall()) {
-        checkWarning("Only for wall face zone");
+        PLWarning("Only for wall face zone");
         return realArray();
     }
-    if (flow.kappal().size() == 0) {
-        checkWarning("Cannot compute heat flux for not giving thermal conductivity");
+    if (flow.kappal().size() == 0 || NullRefObj::isNullRef(flow.kappal())) {
+        PLWarning("Cannot compute heat flux for not giving thermal conductivity");
         return realArray();
     }
 
