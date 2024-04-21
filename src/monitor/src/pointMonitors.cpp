@@ -96,8 +96,11 @@ void OpenHurricane::pointMonitors::writeOutScreenInMaster(const realArray &data)
 void OpenHurricane::pointMonitors::writeOutFileInMaster(const realArray &data) const {
     if (HurMPI::master()) {
         fosPoint_.os() << iter().totalStep();
+        if (iter().hasPhysicalTimeStep()) {
+            fosPoint_.os() << '\t' << toString(iter().pTStep().totalTime()).c_str();
+        }
         for (integer i = 0; i < data.size(); ++i) {
-            fosPoint_.os() << '\t' << std::setprecision(5) << data[i];
+            fosPoint_.os() << '\t' << toString(data[i]).c_str();
         }
         fosPoint_.os() << std::endl;
     }
@@ -218,8 +221,13 @@ OpenHurricane::pointMonitors::pointMonitors(const iteration &iter, const runtime
             fosPoint_.changeMode(std::ios_base::out);
         }
         fosPoint_.open();
-        if (iter.restart()) {
-            fosPoint_.os() << "variables = iter," << monitorVarCmptName_.c_str() << std::endl;
+        if (!iter.restart()) {
+            if (iter.isSteadyFlow()) {
+                fosPoint_.os() << "variables = iter," << monitorVarCmptName_.c_str() << std::endl;
+            } else {
+                fosPoint_.os() << "variables = iter,time_s," << monitorVarCmptName_.c_str()
+                               << std::endl;
+            }
         }
     } else {
         fosPoint_.close();
