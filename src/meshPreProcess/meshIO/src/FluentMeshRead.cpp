@@ -1040,6 +1040,7 @@ void OpenHurricane::FluentMeshRead::parsingFluentBinary() {
         errMsg += ".  nCells_from_regu = " + std::to_string(globalCells_);
         errorAbortStr(errMsg);
     }
+    myin.close();
 }
 
 void OpenHurricane::FluentMeshRead::skipBrackets(std::ifstream &myin, const int nBrackets) const {
