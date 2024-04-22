@@ -223,9 +223,9 @@ OpenHurricane::pointMonitors::pointMonitors(const iteration &iter, const runtime
         fosPoint_.changeMode(std::ios_base::out);
         fosPoint_.open();
         if (iter.isSteadyFlow()) {
-            fosPoint_.os() << "variables = iter," << monitorVarCmptName_.c_str() << std::endl;
+            fosPoint_.os() << "variables = \"iter\"," << monitorVarCmptName_.c_str() << std::endl;
         } else {
-            fosPoint_.os() << "variables = iter,time_s," << monitorVarCmptName_.c_str()
+            fosPoint_.os() << "variables = \"iter\",\"time_s\"," << monitorVarCmptName_.c_str()
                            << std::endl;
         }
     } else {
