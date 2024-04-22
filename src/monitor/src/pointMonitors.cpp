@@ -128,6 +128,9 @@ void OpenHurricane::pointMonitors::setMonitorVarCmpt() {
             componentId_[i + 1] = m;
             monitorVarCmptName_ += monitorVarName_[i];
         }
+        if (i != monitorVarName_.size() - 1) {
+            monitorVarCmptName_ += ",";
+        }
     }
     componentSize_ = m;
 }
