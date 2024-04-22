@@ -217,11 +217,11 @@ OpenHurricane::pointMonitors::pointMonitors(const iteration &iter, const runtime
     setMonitorVarCmpt();
     if (writeToFile_) {
         fosPoint_.changeFileName(outFile_);
-        if (!iter.restart()) {
+        if (!iter.restart() || (iter.restart() && !fosPoint_.existed())) {
             fosPoint_.changeMode(std::ios_base::out);
         }
         fosPoint_.open();
-        if (!iter.restart()) {
+        if (!iter.restart() || (iter.restart() && !fosPoint_.existed())) {
             if (iter.isSteadyFlow()) {
                 fosPoint_.os() << "variables = iter," << monitorVarCmptName_.c_str() << std::endl;
             } else {
