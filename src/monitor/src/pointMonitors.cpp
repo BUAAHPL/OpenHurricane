@@ -228,6 +228,7 @@ OpenHurricane::pointMonitors::pointMonitors(const iteration &iter, const runtime
             fosPoint_.os() << "variables = \"iter\",\"time_s\"," << monitorVarCmptName_.c_str()
                            << std::endl;
         }
+        fosPoint_.os() << "zone T = \"" << monitorName_.c_str() << "\"" << std::endl;
     } else {
         fosPoint_.close();
     }
