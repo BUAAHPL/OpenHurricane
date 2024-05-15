@@ -47,7 +47,7 @@ OpenHurricane::rhoThermo::rhoThermo(const runtimeMesh &mesh, const controller &c
       E_(object("E", mesh, object::WRITE_RELAY_OUTPUT, object::PRIMITIVE), mesh),
       gamma_(object("gamma", mesh, object::WRITE_OUTPUT), mesh),
       cp_(object("cp", mesh, object::WRITE_OUTPUT), mesh), mixPtr_(nullptr) {
-    mixPtr_.reset(new mixture(mesh, cont.subController("mixture")));
+    mixPtr_.reset(new mixture(mesh, cont.subController("mixture"), inviscous));
     getBoundariesFromController::setBoundariesController(const_cast<controller &>(cont.topCont()),
                                                          *mixPtr_);
 }
