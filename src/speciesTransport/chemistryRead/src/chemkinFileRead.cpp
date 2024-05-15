@@ -1064,7 +1064,7 @@ bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(std::stri
 
 bool OpenHurricane::chemkinFileRead::checkAndReplaceThirdbody(std::string &reacStr,
                                                           realArray &efficiences) const {
-    const std::regex thirdBodyRegex("\\+\\s*?(?:M|m)");
+    const std::regex thirdBodyRegex("\\+\\s*?(?:M|m)(?![-a-zA-Z0-9]+?)");
     std::string::const_iterator start = reacStr.begin();
     std::string::const_iterator end = reacStr.end();
     integer count = Zero;
