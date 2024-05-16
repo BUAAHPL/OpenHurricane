@@ -89,11 +89,11 @@ void OpenHurricane::LUSGS::lowerLoop() {
             real bsign;
 
             if (n == cl) {
-                dm += 0.5 * omega_ * rai_[faceI][0] + rav_[faceI][0];
-                ram = 0.5 * rai_[faceI][1] + rav_[faceI][1];
+                dm += 0.5 * (omega_ * rai_[faceI][0] + rav_[faceI][0]);
+                ram = omega_ * rai_[faceI][1] + rav_[faceI][1];
             } else {
-                dm += 0.5 * omega_ * rai_[faceI][1] + rav_[faceI][1];
-                ram = 0.5 * rai_[faceI][0] + rav_[faceI][0];
+                dm += 0.5 * (omega_ * rai_[faceI][1] + rav_[faceI][1]);
+                ram = omega_ * rai_[faceI][0] + rav_[faceI][0];
             }
             if (m < n) {
                 if (n == cl) {
@@ -104,7 +104,7 @@ void OpenHurricane::LUSGS::lowerLoop() {
 
                 fluxJacoDQ(m, bsign * fA[faceI], adq);
                 for (integer ii = 0; ii < flux.size(); ++ii) {
-                    flux[ii] += (0.5 * adq[ii] - ram * dq_[m][ii]);
+                    flux[ii] += 0.5 *( adq[ii] - ram * dq_[m][ii]);
                 }
             }
         }
@@ -205,11 +205,11 @@ void OpenHurricane::LUSGS::upperLoop() {
             real bsign;
 
             if (n == cl) {
-                dm += 0.5 * omega_ * rai_[faceI][0] + rav_[faceI][0];
-                ram = 0.5 * rai_[faceI][1] + rav_[faceI][1];
+                dm += 0.5 * (omega_ * rai_[faceI][0] + rav_[faceI][0]);
+                ram = omega_ * rai_[faceI][1] + rav_[faceI][1];
             } else {
-                dm += 0.5 * omega_ * rai_[faceI][1] + rav_[faceI][1];
-                ram = 0.5 * rai_[faceI][0] + rav_[faceI][0];
+                dm += 0.5 * (omega_ * rai_[faceI][1] + rav_[faceI][1]);
+                ram = omega_ * rai_[faceI][0] + rav_[faceI][0];
             }
             if (m > n) {
                 if (n == cl) {
@@ -219,7 +219,7 @@ void OpenHurricane::LUSGS::upperLoop() {
                 }
                 fluxJacoDQ(m, bsign * fA[faceI], adq);
                 for (integer ii = 0; ii < flux.size(); ++ii) {
-                    flux[ii] += (0.5 * adq[ii] - ram * dq_[m][ii]);
+                    flux[ii] += 0.5 *( adq[ii] - ram * dq_[m][ii]);
                 }
             }
         }
