@@ -222,9 +222,9 @@ void OpenHurricane::AMGSchemeTest::constructOperator() {
             const integer m = (n == cl) ? cr : cl;
 
             if (n == cl) {
-                dm += 0.5 * (omega_ * rai_[faceI][0]) + rav_[faceI][0];
+                dm += 0.5 * (omega_ * rai_[faceI][0] + rav_[faceI][0]);
             } else {
-                dm += 0.5 * (omega_ * rai_[faceI][1]) + rav_[faceI][1];
+                dm += 0.5 * (omega_ * rai_[faceI][1] + rav_[faceI][1]);
             }
         }
 
@@ -270,8 +270,8 @@ void OpenHurricane::AMGSchemeTest::constructOperator() {
 
         solver_.Ac(i, -fA[fi], aji);
         solver_.Ac(j, fA[fi], aij);
-        rami = 0.5 * rai_[fi][1] + rav_[fi][1];
-        ramj = 0.5 * rai_[fi][0] + rav_[fi][0];
+        rami = 0.5 * (rai_[fi][1] + rav_[fi][1]);
+        ramj = 0.5 * (rai_[fi][0] + rav_[fi][0]);
 
         aji *= 0.5;
         aij *= 0.5;
@@ -293,7 +293,7 @@ void OpenHurricane::AMGSchemeTest::constructOperator() {
                 auto &aij = intA[cnt++];
                 real ramj;
                 solver_.Ac(cr, -fA[fi], aij);
-                ramj = 0.5 * rai_[fi][1] + rav_[fi][1];
+                ramj = 0.5 * (rai_[fi][1] + rav_[fi][1]);
                 aij *= 0.5;
                 for (integer pi = 0; pi < paramMap_.size(); ++pi) {
                     aij(pi, pi) -= ramj;
