@@ -600,15 +600,20 @@ void OpenHurricane::mixture::makeSpeciesCUDA(const cudaStreams &streams) const {
 #endif // CUDA_PARALLEL
 
 OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const integer speciesSize,
-                                const bool noReaction)
+                                const bool noReaction, const bool inviscous)
     : basicMixture(mesh, speciesSize), thermoPtr_(nullptr), transportPtr_(nullptr),
       reactionPtr_(nullptr),
 #ifdef CUDA_PARALLEL
       cuChemInterfacePtr_(nullptr), transportCUDAPtr_(nullptr), speciesCUDAPtr_(nullptr),
 #endif // CUDA_PARALLEL
-      noReaction_(noReaction), mixtureTabulation_(mixtureTabulations::none) {
+      noReaction_(noReaction), mixtureTabulation_(mixtureTabulations::none), inviscous_(inviscous) {
+
     thermoPtr_.reset(new thermoList(species_, mesh));
-    transportPtr_.reset(new transportList(species_));
+
+    if (!inviscous_) {
+        transportPtr_.reset(new transportList(species_));
+    }
+
     if (!noReaction_) {
         reactionPtr_.reset(new reactionList(species_, *thermoPtr_));
 #ifdef CUDA_PARALLEL
@@ -618,26 +623,28 @@ OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const integer speciesSi
 }
 
 OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const speciesList &species,
-                                const bool noReaction)
+                                const bool noReaction, const bool inviscous)
     : basicMixture(mesh, species), thermoPtr_(nullptr), transportPtr_(nullptr),
       reactionPtr_(nullptr),
 #ifdef CUDA_PARALLEL
       cuChemInterfacePtr_(nullptr), transportCUDAPtr_(nullptr), speciesCUDAPtr_(nullptr),
 #endif // CUDA_PARALLEL
-      noReaction_(noReaction), mixtureTabulation_(mixtureTabulations::none) {
+      noReaction_(noReaction), mixtureTabulation_(mixtureTabulations::none), inviscous_(inviscous) {
     controller cont("mix");
     controller eosCont("eos", cont);
     controller therCont("thermo", cont);
-    controller tranCont("tran", cont);
 
     eosCont.add(equationOfState::className_, string("perfectGas"));
     therCont.add(thermo::className_, string("constCp"));
-    tranCont.add(transport::className_, string("sutherlandTwo"));
     cont.add(equationOfState::className_, eosCont);
     cont.add(thermo::className_, therCont);
-    cont.add(transport::className_, tranCont);
     thermoPtr_.reset(new thermoList(species, cont, mesh));
-    transportPtr_.reset(new transportList(species, cont));
+    if (!inviscous_) {
+        controller tranCont("tran", cont);
+        tranCont.add(transport::className_, string("sutherlandTwo"));
+        cont.add(transport::className_, tranCont);
+        transportPtr_.reset(new transportList(species, cont));
+    }
 }
 
 OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const speciesList &species,
@@ -647,7 +654,7 @@ OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const speciesList &spec
 #ifdef CUDA_PARALLEL
       cuChemInterfacePtr_(nullptr), transportCUDAPtr_(nullptr), speciesCUDAPtr_(nullptr),
 #endif // CUDA_PARALLEL
-      noReaction_(false), mixtureTabulation_(mixtureTabulations::none) {
+      noReaction_(false), mixtureTabulation_(mixtureTabulations::none), inviscous_(inviscous) {
     if (cont.found("chemical")) {
         string chemicalType = cont.findWord("chemical");
         stringToLowerCase(chemicalType);
@@ -867,7 +874,7 @@ OpenHurricane::mixture::mixture(const runtimeMesh &mesh, const controller &cont,
 #ifdef CUDA_PARALLEL
       cuChemInterfacePtr_(nullptr), transportCUDAPtr_(nullptr), speciesCUDAPtr_(nullptr),
 #endif // CUDA_PARALLEL
-      noReaction_(false), mixtureTabulation_(mixtureTabulations::none) {
+      noReaction_(false), mixtureTabulation_(mixtureTabulations::none), inviscous_(inviscous) {
     if (cont.found("chemical")) {
         string chemicalType = cont.findWord("chemical");
         stringToLowerCase(chemicalType);

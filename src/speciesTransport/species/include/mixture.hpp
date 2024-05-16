@@ -240,12 +240,16 @@ namespace OpenHurricane {
 
         mixtureTabulations mixtureTabulation_;
 
+        bool inviscous_;
+
     public:
         // Constructors
 
-        mixture(const runtimeMesh &mesh, const integer speciesSize, const bool noReaction = false);
+        mixture(const runtimeMesh &mesh, const integer speciesSize, const bool noReaction = false,
+                const bool inviscous = false);
 
-        mixture(const runtimeMesh &mesh, const speciesList &species, const bool noReaction = false);
+        mixture(const runtimeMesh &mesh, const speciesList &species, const bool noReaction = false,
+                const bool inviscous = false);
 
         mixture(const runtimeMesh &mesh, const speciesList &species, const controller &cont,
                 const bool inviscous = false);
@@ -400,6 +404,7 @@ namespace OpenHurricane {
 
         /*!\brief Reutrn true if there is no reaction in the mixture.*/
         hur_nodiscard inline bool noReaction() const noexcept { return noReaction_; }
+        hur_nodiscard inline bool inviscous() const noexcept { return inviscous_; }
 
         /*!\brief Mixture average molecular weight field.*/
         hur_nodiscard cellRealArray W() const;

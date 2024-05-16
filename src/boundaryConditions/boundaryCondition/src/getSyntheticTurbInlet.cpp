@@ -30,9 +30,9 @@
 #include "rhoThermo.hpp"
 
 void OpenHurricane::getBoundariesFromController::getSyntheticTurbInlet(const mixture &mixtures,
-                                                                   const controller &cont,
-                                                                   controller &bcCont,
-                                                                   const faceZone &fz) {
+                                                                       const controller &cont,
+                                                                       controller &bcCont,
+                                                                       const faceZone &fz) {
     bcCont.add(std::string("defultType"), string("fixedValue"));
     bcCont.add(std::string("vbcType"), string("syntheticTurbInlet"));
     bcCont.add(std::string("rhobcType"), string("interior"));
@@ -54,13 +54,16 @@ void OpenHurricane::getBoundariesFromController::getSyntheticTurbInlet(const mix
     real p = constant::physicalConstant::Patm;
 
     real g = mixtures.thermalTable().gamma(p, T, yi);
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
 
     real a = sqrt(g * mixtures.species().Rm(yi) * T);
 
     real ma;
     real vMag = 0;
-    real Re;
+    real Re = 0;
     real rho = Zero;
     if (gbw == "pressureAndMach") {
         if (!bcCont.found("p")) {
@@ -72,11 +75,16 @@ void OpenHurricane::getBoundariesFromController::getSyntheticTurbInlet(const mix
         p = bcCont.findType<real>("p", p);
         ma = bcCont.findType<real>("ma", ma);
         g = mixtures.thermalTable().gamma(p, T, yi);
-        mufree = mixtures.transTable().mu(p, T, yi);
+       
         a = sqrt(g * mixtures.species().Rm(yi) * T);
         vMag = ma * a;
         rho = mixtures.thermalTable().eos().rhom(p, T, yi);
-        Re = rho * vMag / mufree;
+
+        if (!mixtures.inviscous()) {
+            mufree = mixtures.transTable().mu(p, T, yi);
+            Re = rho * vMag / mufree;
+        }
+
         bcCont.add(std::string("v"), vMag);
         bcCont.add(std::string("rho"), rho);
         bcCont.add(std::string("Re"), Re);
@@ -90,15 +98,25 @@ void OpenHurricane::getBoundariesFromController::getSyntheticTurbInlet(const mix
         p = bcCont.findType<real>("p", p);
         vMag = bcCont.findType<real>("v", vMag);
         g = mixtures.thermalTable().gamma(p, T, yi);
-        mufree = mixtures.transTable().mu(p, T, yi);
+        
         a = sqrt(g * mixtures.species().Rm(yi) * T);
         ma = vMag / a;
         rho = mixtures.thermalTable().eos().rhom(p, T, yi);
-        Re = rho * vMag / mufree;
+
+        if (!mixtures.inviscous()) {
+            mufree = mixtures.transTable().mu(p, T, yi);
+            Re = rho * vMag / mufree;
+        }
+
         bcCont.add(std::string("ma"), ma);
         bcCont.add(std::string("rho"), rho);
         bcCont.add(std::string("Re"), Re);
     } else if (gbw == "ReynoldAndMach") {
+        if (mixtures.inviscous()) {
+            LFatal("The option: \"ReynoldAndMach\" cannot be used in inviscous mixtures in face "
+                   "zone: %s",
+                   fz.name().c_str());
+        }
         if (!bcCont.found("Re")) {
             LFatal("The Reynold number must specified in face zone: %s", fz.name().c_str());
         }
@@ -138,6 +156,11 @@ void OpenHurricane::getBoundariesFromController::getSyntheticTurbInlet(const mix
         bcCont.add(std::string("v"), vMag);
         bcCont.add(std::string("rho"), rho);
     } else if (gbw == "ReynoldAndVMag") {
+        if (mixtures.inviscous()) {
+            LFatal("The option: \"ReynoldAndVMag\" cannot be used in inviscous mixtures in face "
+                   "zone: %s",
+                   fz.name().c_str());
+        }
         if (!bcCont.found("Re")) {
             LFatal("The Reynold number must specified in face zone: %s", fz.name().c_str());
         }

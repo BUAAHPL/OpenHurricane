@@ -30,7 +30,7 @@
 #include "rhoThermo.hpp"
 
 void OpenHurricane::getBoundariesFromController::setBoundariesController(controller &cont,
-                                                                     const mixture &mixtures) {
+                                                                         const mixture &mixtures) {
     const auto &fZL = mixtures.mesh().faceZones();
 
     if (!cont.found("boundaryCondition")) {
@@ -111,7 +111,7 @@ void OpenHurricane::getBoundariesFromController::setBoundariesController(control
             addCont.add(std::string("bcType"), string("interior"));
             interCont.add(fZL[i].name(), addCont);
         } else {
-            LFatal("Boundary condition of faceZone[%d] named %s has not been specified.",i,
+            LFatal("Boundary condition of faceZone[%d] named %s has not been specified.", i,
                    fZL[i].name().c_str());
         }
     }
@@ -180,9 +180,9 @@ OpenHurricane::realArray OpenHurricane::getBoundariesFromController::getSpeciesM
 }
 
 void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixture &mixtures,
-                                                                 const controller &cont,
-                                                                 controller &bcCont,
-                                                                 const faceZone &fz) {
+                                                                     const controller &cont,
+                                                                     controller &bcCont,
+                                                                     const faceZone &fz) {
     if (bcCont.found("bcType")) {
         bcCont.remove("bcType");
     }
@@ -213,13 +213,16 @@ void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixtu
     real p = constant::physicalConstant::Patm;
 
     real g = mixtures.thermalTable().gamma(p, T, yi);
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
 
     real a = sqrt(g * mixtures.species().Rm(yi) * T);
 
     real ma;
     real vMag = 0;
-    real Re;
+    real Re = 0;
     real rho = Zero;
     if (gbw == "pressureAndMach") {
         if (!bcCont.found("p")) {
@@ -231,11 +234,16 @@ void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixtu
         p = bcCont.findType<real>("p", p);
         ma = bcCont.findType<real>("ma", ma);
         g = mixtures.thermalTable().gamma(p, T, yi);
-        mufree = mixtures.transTable().mu(p, T, yi);
+
         a = sqrt(g * mixtures.species().Rm(yi) * T);
         vMag = ma * a;
         rho = mixtures.thermalTable().eos().rhom(p, T, yi);
-        Re = rho * vMag / mufree;
+
+        if (!mixtures.inviscous()) {
+            mufree = mixtures.transTable().mu(p, T, yi);
+            Re = rho * vMag / mufree;
+        }
+
         bcCont.add(std::string("v"), vMag);
         bcCont.add(std::string("rho"), rho);
         bcCont.add(std::string("Re"), Re);
@@ -249,15 +257,25 @@ void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixtu
         p = bcCont.findType<real>("p", p);
         vMag = bcCont.findType<real>("v", vMag);
         g = mixtures.thermalTable().gamma(p, T, yi);
-        mufree = mixtures.transTable().mu(p, T, yi);
+
         a = sqrt(g * mixtures.species().Rm(yi) * T);
         ma = vMag / a;
         rho = mixtures.thermalTable().eos().rhom(p, T, yi);
-        Re = rho * vMag / mufree;
+
+        if (!mixtures.inviscous()) {
+            mufree = mixtures.transTable().mu(p, T, yi);
+            Re = rho * vMag / mufree;
+        }
+
         bcCont.add(std::string("ma"), ma);
         bcCont.add(std::string("rho"), rho);
         bcCont.add(std::string("Re"), Re);
     } else if (gbw == "ReynoldAndMach") {
+        if (mixtures.inviscous()) {
+            LFatal("The option: \"ReynoldAndMach\" cannot be used in inviscous mixtures in face "
+                   "zone: %s",
+                   fz.name().c_str());
+        }
         if (!bcCont.found("Re")) {
             LFatal("The Reynold number must specified in face zone: %s", fz.name().c_str());
         }
@@ -297,6 +315,11 @@ void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixtu
         bcCont.add(std::string("v"), vMag);
         bcCont.add(std::string("rho"), rho);
     } else if (gbw == "ReynoldAndVMag") {
+        if (mixtures.inviscous()) {
+            LFatal("The option: \"ReynoldAndVMag\" cannot be used in inviscous mixtures in face "
+                   "zone: %s",
+                   fz.name().c_str());
+        }
         if (!bcCont.found("Re")) {
             LFatal("The Reynold number must specified in face zone: %s", fz.name().c_str());
         }
@@ -354,9 +377,9 @@ void OpenHurricane::getBoundariesFromController::getPressureFarField(const mixtu
 }
 
 void OpenHurricane::getBoundariesFromController::getVelocityInlet(const mixture &mixtures,
-                                                              const controller &cont,
-                                                              controller &bcCont,
-                                                              const faceZone &fz) {
+                                                                  const controller &cont,
+                                                                  controller &bcCont,
+                                                                  const faceZone &fz) {
     getSupersonicInlet(mixtures, cont, bcCont, fz);
     if (fz.bcType() != faceBCType::bcTypes::VELOCITYINLET) {
         const_cast<faceZone &>(fz).setBcType(faceBCType::bcTypes::VELOCITYINLET);
@@ -364,9 +387,9 @@ void OpenHurricane::getBoundariesFromController::getVelocityInlet(const mixture 
 }
 
 void OpenHurricane::getBoundariesFromController::getSubsonicInlet(const mixture &mixtures,
-                                                              const controller &cont,
-                                                              controller &bcCont,
-                                                              const faceZone &fz) {
+                                                                  const controller &cont,
+                                                                  controller &bcCont,
+                                                                  const faceZone &fz) {
     bcCont.add(std::string("rhobcType"), string("subsonicInlet"));
     bcCont.add(std::string("vbcType"), string("interior"));
     bcCont.add(std::string("pbcType"), string("interior"));
@@ -411,13 +434,16 @@ void OpenHurricane::getBoundariesFromController::getSubsonicInlet(const mixture 
     bcCont.add(std::string("v"), v);
     bcCont.add(std::string("p"), p);
     bcCont.add(std::string("T"), T);
-    //real E = mixtures.thermalTable().ea_p(p0, T0, yi);
+ 
     real E = mixtures.thermalTable().ea_p(p, T, yi) + real(0.5) * v * v;
     bcCont.add(std::string("E"), E);
 
     real g = mixtures.thermalTable().gamma(p, T, yi);
     bcCont.add(std::string("gamma"), g);
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
     bcCont.add(std::string("mu"), mufree);
 
     real Rgas = mixtures.species().Rm(yi);
@@ -429,9 +455,9 @@ void OpenHurricane::getBoundariesFromController::getSubsonicInlet(const mixture 
 }
 
 void OpenHurricane::getBoundariesFromController::getPressureInlet(const mixture &mixtures,
-                                                              const controller &cont,
-                                                              controller &bcCont,
-                                                              const faceZone &fz) {
+                                                                  const controller &cont,
+                                                                  controller &bcCont,
+                                                                  const faceZone &fz) {
     bcCont.add(std::string("rhobcType"), string("pressureInlet"));
     bcCont.add(std::string("vbcType"), string("interior"));
     bcCont.add(std::string("pbcType"), string("interior"));
@@ -480,7 +506,10 @@ void OpenHurricane::getBoundariesFromController::getPressureInlet(const mixture 
     bcCont.add(std::string("E"), E);
 
     real g = mixtures.thermalTable().gamma(p, T, yi);
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
     bcCont.add(std::string("gamma"), g);
     bcCont.add(std::string("mu"), mufree);
 
@@ -494,9 +523,9 @@ void OpenHurricane::getBoundariesFromController::getPressureInlet(const mixture 
 }
 
 void OpenHurricane::getBoundariesFromController::getMassFlowInlet(const mixture &mixtures,
-                                                              const controller &cont,
-                                                              controller &bcCont,
-                                                              const faceZone &fz) {
+                                                                  const controller &cont,
+                                                                  controller &bcCont,
+                                                                  const faceZone &fz) {
     bcCont.add(std::string("rhobcType"), string("massFlowInlet"));
     bcCont.add(std::string("vbcType"), string("interior"));
     bcCont.add(std::string("pbcType"), string("interior"));
@@ -600,9 +629,7 @@ void OpenHurricane::getBoundariesFromController::getMassFlowInlet(const mixture 
 
     real h0 = mixtures.thermalTable().ha_p(p0, T0, yi);
     bcCont.add(std::string("totalEnthalpy"), h0);
-    //if (cont.subController("initialization").findWord("initFromBoundary") == fz.name())
-    //{
-    //real flux = bcCont.findType<real>("massFlux", flux);
+   
     real rho = mixtures.thermalTable().rho(p, T, yi);
     real v = flux / rho;
     real E = mixtures.thermalTable().ea_p(p, T, yi) + real(0.5) * v * v;
@@ -610,11 +637,12 @@ void OpenHurricane::getBoundariesFromController::getMassFlowInlet(const mixture 
     bcCont.add(std::string("T"), T);
     bcCont.add(std::string("rho"), rho);
     bcCont.add(std::string("v"), v);
-    //Pout << " flux = " << flux << " v = " << v << " rho= " << rho << " T = " << T << std::endl;
-    //}
-
+    
     real g = mixtures.thermalTable().gamma(p, T, yi);
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
     bcCont.add(std::string("gamma"), g);
     bcCont.add(std::string("mu"), mufree);
 
@@ -622,16 +650,15 @@ void OpenHurricane::getBoundariesFromController::getMassFlowInlet(const mixture 
     bcCont.add(std::string("Rgas"), Rgas);
     if (mixtures.species().size() > 1) {
         for (integer isp = 0; isp < mixtures.species().size(); ++isp) {
-            bcCont.add(mixtures.species()[isp].name() + "bcType",
-                       string("fixedValue"));
+            bcCont.add(mixtures.species()[isp].name() + "bcType", string("fixedValue"));
         }
     }
 }
 
 void OpenHurricane::getBoundariesFromController::getDetonationInlet(const mixture &mixtures,
-                                                                const controller &cont,
-                                                                controller &bcCont,
-                                                                const faceZone &fz) {
+                                                                    const controller &cont,
+                                                                    controller &bcCont,
+                                                                    const faceZone &fz) {
     bcCont.add(std::string("vbcType"), string("detonationInlet"));
     bcCont.add(std::string("rhobcType"), string("interior"));
     bcCont.add(std::string("pbcType"), string("interior"));
@@ -684,7 +711,11 @@ void OpenHurricane::getBoundariesFromController::getDetonationInlet(const mixtur
     bcCont.add(std::string("rho"), rho);
     bcCont.add(std::string("v"), v);
 
-    real mufree = mixtures.transTable().mu(p, T, yi);
+    real mufree = 0;
+    if (!mixtures.inviscous()) {
+        mufree = mixtures.transTable().mu(p, T, yi);
+    }
+
     bcCont.add(std::string("gamma"), g);
     bcCont.add(std::string("mu"), mufree);
 
@@ -692,17 +723,17 @@ void OpenHurricane::getBoundariesFromController::getDetonationInlet(const mixtur
     bcCont.add(std::string("Rgas"), Rgas);
     if (mixtures.species().size() > 1) {
         for (integer isp = 0; isp < mixtures.species().size(); ++isp) {
-            bcCont.add(mixtures.species()[isp].name() + "bcType",
-                       string("fixedValue"));
+            bcCont.add(mixtures.species()[isp].name() + "bcType", string("fixedValue"));
         }
     }
 }
 
-void OpenHurricane::getBoundariesFromController::getOutflow(const controller &cont, controller &bcCont,
-                                                        const faceZone &fz) {
+void OpenHurricane::getBoundariesFromController::getOutflow(const controller &cont,
+                                                            controller &bcCont,
+                                                            const faceZone &fz) {
     bcCont.remove("bcType");
     bcCont.add("bcType", string("outflow"));
-    //controller& bcCont = interCont.subController(fZL[i].name());
+  
     const auto bcKey = bcCont.findWord("bcType");
     if (bcCont.found("p")) {
         bcCont.add(std::string("defultType"), string("outflow"));
@@ -718,29 +749,23 @@ void OpenHurricane::getBoundariesFromController::getOutflow(const controller &co
 }
 
 void OpenHurricane::getBoundariesFromController::getPressureOutlet(const controller &cont,
-                                                               controller &bcCont,
-                                                               const faceZone &fz) {
+                                                                   controller &bcCont,
+                                                                   const faceZone &fz) {
     if (!bcCont.found("p")) {
         LFatal("The pressure must specified in face zone: %s", fz.name().c_str());
     }
-    //controller& bcCont = interCont.subController(fZL[i].name());
     bcCont.add(std::string("rhobcType"), string("pressureOutlet"));
-    //bcCont.add(std::string("vbcType"), string("interior"));
     bcCont.add(std::string("pbcType"), string("interior"));
-    //bcCont.add(std::string("TbcType"), string("interior"));
     bcCont.add(std::string("defultType"), string("zeroGradient"));
-    /*bcCont.add(std::string("pbcType"), string("pressureOutlet"));
-    bcCont.add(std::string("EbcType"), string("totalEnergyExtrapolate"));
-    bcCont.add(std::string("defultType"), string("zeroGradient"));*/
     if (fz.bcType() != faceBCType::bcTypes::PRESSUREOUTLET) {
         const_cast<faceZone &>(fz).setBcType(faceBCType::bcTypes::PRESSUREOUTLET);
     }
 }
 
 void OpenHurricane::getBoundariesFromController::getWallCondition(const mixture &mixtures,
-                                                              const controller &cont,
-                                                              controller &bcCont,
-                                                              const faceZone &fz) {
+                                                                  const controller &cont,
+                                                                  controller &bcCont,
+                                                                  const faceZone &fz) {
     if (bcCont.found("thermal")) {
         if (!bcCont.subController("thermal").found("thermalCondition")) {
             LFatal("The thermal condition must specified in face zone: %s", fz.name().c_str());
@@ -798,8 +823,7 @@ void OpenHurricane::getBoundariesFromController::getWallCondition(const mixture 
             }
             getSpeciesMassFractions(bcCont, mixtures, true);
             for (integer isp = 0; isp < species.size(); ++isp) {
-                bcCont.add(species[isp].name() + "bcType",
-                           string("fixedValue"));
+                bcCont.add(species[isp].name() + "bcType", string("fixedValue"));
             }
         } else {
             LFatal("Unknown species condition type: %s in face zone: %s", speciesCondition.c_str(),
@@ -814,15 +838,15 @@ void OpenHurricane::getBoundariesFromController::getWallCondition(const mixture 
 }
 
 void OpenHurricane::getBoundariesFromController::addBcTypeToController(const string &fzName,
-                                                                   controller &interCont,
-                                                                   std::string &bcType) {
+                                                                       controller &interCont,
+                                                                       std::string &bcType) {
     controller addCont(fzName, interCont);
     addCont.add(std::string("bcType"), string(bcType));
     interCont.add(fzName, addCont);
 }
 
-void OpenHurricane::getBoundariesFromController::checkInitializationSetting(const controller &cont,
-                                                                        const runtimeMesh &mesh) {
+void OpenHurricane::getBoundariesFromController::checkInitializationSetting(
+    const controller &cont, const runtimeMesh &mesh) {
     if (!cont.found("initialization")) {
         LFatal("Cannot find initialization controller in: %s", cont.name().c_str());
     }
