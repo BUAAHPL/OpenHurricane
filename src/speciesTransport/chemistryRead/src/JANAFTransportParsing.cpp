@@ -150,9 +150,15 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
     }
 
     for (integer i = 0; i < transportFileList_.size(); ++i) {
-
-        if (!trimCopy(transportFileList_[i]).empty()) {
-            string speciesName = extractSpeciesName(transportFileList_[i].substr(0, 18));
+        std::string tranline = trimCopy(transportFileList_[i]);
+        if (!tranline.empty()) {
+            stdStringList tranlineEle;
+            split(tranline, tranlineEle, " ");
+            if (tranlineEle.size() < 7) {
+                PLWarning("The format of transport line: %s is wrong in transport file parsing",
+                          transportFileList_[i].c_str());
+            }
+            string speciesName = extractSpeciesName(tranlineEle[0] + " ");
             for (integer j = 0; j < speciesNameList_.size(); ++j) {
                 if (speciesNameList_[j] == speciesName) {
                     speciesFlag_[j]++;
@@ -160,7 +166,8 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
                     if (speciesFlag_[j] > 1) {
                         break;
                     }
-                    std::stringstream ss(transportFileList_[i].substr(18));
+                    replaceAllMarks(tranline, speciesName, "");
+                    std::stringstream ss(tranline);
                     integer moleculeIndex;
                     real potentialWellDepth;
                     real collisionDiameter;
