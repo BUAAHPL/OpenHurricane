@@ -155,7 +155,7 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
             stdStringList tranlineEle;
             split(tranline, tranlineEle, " ");
             if (tranlineEle.size() < 7) {
-                PLWarning("The format of transport line: %s is wrong in transport file parsing",
+                PLWarning("The format of transport line: %s is wrong in transport file parsing\n",
                           transportFileList_[i].c_str());
             }
             string speciesName = extractSpeciesName(tranlineEle[0] + " ");
