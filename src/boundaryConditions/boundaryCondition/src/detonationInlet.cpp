@@ -86,6 +86,9 @@ void OpenHurricane::detonationInlet::updateBoundary() {
     if (p.mesh().Iteration().hasSubIteration()) {
         subCstep = p.mesh().Iteration().subIter().cSubStep();
     }
+    if (subCstep > 1) {
+        return;
+    }
 
     real Ma = 1.0;
     real g0 = 1.4;
