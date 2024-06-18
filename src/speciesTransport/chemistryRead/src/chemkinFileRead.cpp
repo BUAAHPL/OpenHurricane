@@ -146,10 +146,10 @@ hur_nodiscard std::string OpenHurricane::chemkinFileRead::readReactionString() c
 }
 
 void OpenHurricane::chemkinFileRead::parsingReacStoich(const std::string &forwardStr,
-                                                   List<reacSpcCoeffType> &forwardCoeff,
-                                                   const std::string &backwardStr,
-                                                   List<reacSpcCoeffType> &backwardCoeff,
-                                                   const std::string &reactionName) const {
+                                                       List<reacSpcCoeffType> &forwardCoeff,
+                                                       const std::string &backwardStr,
+                                                       List<reacSpcCoeffType> &backwardCoeff,
+                                                       const std::string &reactionName) const {
     auto readReacSpcFromMap = [&](auto &map, List<reacSpcCoeffType> &coeff) {
         integer sj = 0;
         for (auto iter = map.begin(); iter != map.end(); ++iter) {
@@ -453,8 +453,7 @@ void OpenHurricane::chemkinFileRead::parsingReaction() {
                                                reacName));
                             }
                             if (rType != reactionType::NONEQUILIBRIUMREVERSIBLE) {
-                                LFatal(
-                                    "The keyword RLT must follow the explicit REV parameters");
+                                LFatal("The keyword RLT must follow the explicit REV parameters");
                             }
                             realArray revLandauTellerCoeffs(2);
                             std::string searchStr = reactionLineStr[i + 1].substr(posList[keyI]);
@@ -796,9 +795,9 @@ void OpenHurricane::chemkinFileRead::parsingReaction() {
 }
 
 void OpenHurricane::chemkinFileRead::parsingThirdBodyCoeffs(const std::string &thirdBodyLineStr,
-                                                        realArray &efficiens,
-                                                        bool isPressureDependent,
-                                                        const integer enhancedSpeId) const {
+                                                            realArray &efficiens,
+                                                            bool isPressureDependent,
+                                                            const integer enhancedSpeId) const {
     const std::regex thirdBodyRegex("(\\S+?)\\s*\\/\\s*(.*?)\\s*\\/");
     std::string::const_iterator start = thirdBodyLineStr.begin();
     auto end = thirdBodyLineStr.end();
@@ -823,7 +822,7 @@ void OpenHurricane::chemkinFileRead::parsingThirdBodyCoeffs(const std::string &t
 
 hur_nodiscard OpenHurricane::stdStringList
 OpenHurricane::chemkinFileRead::splitReacSpecToStrList(const std::string &reacSpecies,
-                                                   const std::string &reactionName) const {
+                                                       const std::string &reactionName) const {
     stdStringList splitRS;
     auto trimSpecStr = trimCopy(reacSpecies);
     if (trimSpecStr.empty()) {
@@ -901,7 +900,7 @@ bool OpenHurricane::chemkinFileRead::checkReacSpec(const std::string &rsp, integ
 
 hur_nodiscard std::map<std::string, OpenHurricane::real>
 OpenHurricane::chemkinFileRead::parsingReacSpc(const std::string &reacSpc,
-                                           const std::string &reactionName) const {
+                                               const std::string &reactionName) const {
     auto strl = splitReacSpecToStrList(reacSpc, reactionName);
     std::map<std::string, real> reacSpcM;
     std::regex stoichiometryRegex("((?:[0-9]*)\\.*[0-9]*)\\s*(\\S+)");
@@ -973,8 +972,8 @@ void OpenHurricane::chemkinFileRead::parsingSRI(void **fofPtr, const string &SRI
 }
 
 void OpenHurricane::chemkinFileRead::parsingReacSpcOrder(const std::string &reacName,
-                                                     const std::string &str, std::regex &reg,
-                                                     List<reacSpcCoeffType> &coef) const {
+                                                         const std::string &str, std::regex &reg,
+                                                         List<reacSpcCoeffType> &coef) const {
     std::smatch resultMatch;
     std::regex_search(str, resultMatch, reg);
     std::string speN = resultMatch[2];
@@ -1000,9 +999,8 @@ void OpenHurricane::chemkinFileRead::parsingReacSpcOrder(const std::string &reac
     }
 }
 
-bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(std::string &reacStr,
-                                                                   integer &id,
-                                                                   realArray &efficiences) const {
+bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(
+    std::string &reacStr, integer &id, realArray &efficiences) const {
     std::regex pressureDependentRegex("\\(\\s*?\\+\\s*?(.*?)\\s*?\\)");
     std::smatch what;
     std::string::const_iterator start = reacStr.begin();
@@ -1063,7 +1061,7 @@ bool OpenHurricane::chemkinFileRead::checkAndReplacePressureDependency(std::stri
 }
 
 bool OpenHurricane::chemkinFileRead::checkAndReplaceThirdbody(std::string &reacStr,
-                                                          realArray &efficiences) const {
+                                                              realArray &efficiences) const {
     const std::regex thirdBodyRegex("\\+\\s*?(?:M|m)(?![-a-zA-Z0-9]+?)");
     std::string::const_iterator start = reacStr.begin();
     std::string::const_iterator end = reacStr.end();
@@ -1116,7 +1114,7 @@ hur_nodiscard bool OpenHurricane::chemkinFileRead::checkReactionDuplicate(
 
 hur_nodiscard bool
 OpenHurricane::chemkinFileRead::checkReacSpecList(const List<reacSpcCoeffType> &coeff1,
-                                              const List<reacSpcCoeffType> &coeff2) const {
+                                                  const List<reacSpcCoeffType> &coeff2) const {
     if (coeff1.size() != coeff2.size()) {
         return false;
     } else {
@@ -1286,8 +1284,8 @@ void OpenHurricane::chemkinFileRead::parsingGlobalUnits() {
 }
 
 void OpenHurricane::chemkinFileRead::findLineKeywordType(const std::string &lineStr,
-                                                     stringList &lineKeyword,
-                                                     integerList &pos) const {
+                                                         stringList &lineKeyword,
+                                                         integerList &pos) const {
     std::regex keywordRegex("(?:(\\S+?)\\s*\\/[\\s\\S]*?\\/|(\\S+?)(?:\\b|$))");
     std::smatch resultMatch;
     auto start = lineStr.begin();
@@ -1318,7 +1316,7 @@ void OpenHurricane::chemkinFileRead::findLineKeywordType(const std::string &line
 
 hur_nodiscard bool
 OpenHurricane::chemkinFileRead::checkElementBalance(const List<reacSpcCoeffType> &fwdCoeff,
-                                                const List<reacSpcCoeffType> &bwdCoeff) const {
+                                                    const List<reacSpcCoeffType> &bwdCoeff) const {
     realList nAtoms(specTable_.elementsNameList().size());
     for (auto &iA : nAtoms) {
         iA = 0;
@@ -1654,8 +1652,8 @@ void OpenHurricane::chemkinFileRead::addReactionToList(
 }
 
 void OpenHurricane::chemkinFileRead::changeUnit(const real reactionOrder, const unitTypesOfA uA,
-                                            const unitTypesOfE uE, const bool isThirdBody,
-                                            real &Afactor, real &Efactor) const {
+                                                const unitTypesOfE uE, const bool isThirdBody,
+                                                real &Afactor, real &Efactor) const {
     const real RRjoule = constant::physicalConstant::R;             // J/mol-K
     const real RRcal = RRjoule / constant::physicalConstant::calTh; // cal/mol-K
 
@@ -1720,12 +1718,10 @@ OpenHurricane::chemkinFileRead::getTransportString(const std::string &chemFileSt
     return transportString;
 }
 
-OpenHurricane::chemkinFileRead::chemkinFileRead(const controller &cont, reactionList &rsT,
-                                            speciesList &spT, thermoList &ther,
-                                            transportList &tran, const std::string &chemFileString,
-                                            const std::string &thermoFileString,
-                                            const std::string &transportFileString,
-                                            const bool noReaction, const bool inviscous)
+OpenHurricane::chemkinFileRead::chemkinFileRead(
+    const controller &cont, reactionList &rsT, speciesList &spT, thermoList &ther,
+    transportList &tran, const std::string &chemFileString, const std::string &thermoFileString,
+    const std::string &transportFileString, const bool noReaction, const bool inviscous)
     : reactions_(rsT), thermo_(ther), transport_(tran), cont_(cont), noReaction_(noReaction),
       inviscous_(inviscous), chemkinFileString_(replaceComments(chemFileString)), reactionString_(),
       thermoFileString_(), transportFileString_(), specTable_(spT), imbalanceTol_(rootTiny),
@@ -1776,6 +1772,11 @@ void OpenHurricane::chemkinFileRead::parsing() {
     Pout << std::right;
     Pout << "    Info: Parsing species: " << std::endl;
     auto speNList = parsingSpecies();
+    integer maxLen = 13;
+    for (integer i = 0; i < speNList.size(); i++) {
+        maxLen = max(maxLen, (integer)speNList[i].size() + 1);
+    }
+
     Pout << "         " << speNList.size() << " species including: " << std::endl;
     Pout << "         "
          << "------------------------------------------------------------------"
@@ -1784,7 +1785,7 @@ void OpenHurricane::chemkinFileRead::parsing() {
         if (i % 8 == 0 || i == 0) {
             Pout << std::endl << "         ";
         }
-        Pout << std::left << std::setfill(' ') << std::setw(13) << speNList[i];
+        Pout << std::left << std::setfill(' ') << std::setw(maxLen) << speNList[i];
     }
     Pout << std::endl
          << "         "

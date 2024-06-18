@@ -41,6 +41,10 @@ namespace OpenHurricane {
 
         directionType directionType_;
 
+        enum class inletStateType : short { blocking, subsonic, supersonic };
+
+        List<inletStateType> inletType_;
+
         vector direct_;
 
         /**\brief Total temperature.*/

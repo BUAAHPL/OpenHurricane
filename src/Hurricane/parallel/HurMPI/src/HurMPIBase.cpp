@@ -35,6 +35,8 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
+
+// Include after winsock2.h
 #include <Windows.h>
 #include <process.h>
 #pragma comment(lib, "ws2_32.lib")
@@ -59,7 +61,8 @@ namespace OpenHurricane {
     HurMPIBase::subCommtor HurMPIBase::nodeCommtor_;
 } // namespace OpenHurricane
 
-hur_nodiscard const OpenHurricane::HurMPIBase::subCommtor &OpenHurricane::HurMPIBase::subCommtor::null() {
+hur_nodiscard const OpenHurricane::HurMPIBase::subCommtor &
+OpenHurricane::HurMPIBase::subCommtor::null() {
     return NullRefObj::nullRef<subCommtor>();
 }
 
@@ -70,19 +73,20 @@ OpenHurricane::HurMPIBase::subCommtor::subCommtor(const Comm comm, const int col
     MPI_Comm_rank(subComm_, &subProcRank_);
     MPI_Comm_size(subComm_, &subProcSize_);
 #endif
- }
+}
 
- void OpenHurricane::HurMPIBase::subCommtor::freeSubComm() {
+void OpenHurricane::HurMPIBase::subCommtor::freeSubComm() {
 #ifdef MPI_PARALLEL
     MPI_Comm_free(&subComm_);
     subProcRank_ = 0;
     subProcSize_ = 0;
 #endif
- }
+}
 
 #ifdef MPI_PARALLEL
 #else // Not define MPI_PARALLEL
-void OpenHurricane::HurMPIBase::copyData(const void *sendbuf, void *recvbuf, int size, Datatype datatype) {
+void OpenHurricane::HurMPIBase::copyData(const void *sendbuf, void *recvbuf, int size,
+                                         Datatype datatype) {
     switch (datatype) {
     case MPI_DOUBLE:
         for (int i = 0; i < size; ++i) {
@@ -158,7 +162,7 @@ void OpenHurricane::HurMPIBase::copyData(const void *sendbuf, void *recvbuf, int
 }
 #endif
 void OpenHurricane::HurMPIBase::error(const std::string &ErrorMsg, const std::string &FunctionName,
-                                  bool isAbort) {
+                                      bool isAbort) {
 #ifdef MPI_PARALLEL
     if (isInitialized_) {
         bool isCollective = isCollectiveCall(1.0);
@@ -167,7 +171,7 @@ void OpenHurricane::HurMPIBase::error(const std::string &ErrorMsg, const std::st
             minRank_ = getMinRank(winMinRank_);
         }
 
-        if ((!isCollective&&procRank_ == minRank_) || (isCollective && master())) {
+        if ((!isCollective && procRank_ == minRank_) || (isCollective && master())) {
             std::cerr << std::endl << std::endl;
             std::cerr << "========================================================================="
                          "=========="
@@ -214,7 +218,7 @@ void OpenHurricane::HurMPIBase::error(const std::string &ErrorMsg, const std::st
             abort(HurWorldComm_, 0);
         }
     }
-#else // Not define MPI_PARALLEL
+#else  // Not define MPI_PARALLEL
     if (procRank_ == 0) {
         std::cerr << std::endl << std::endl;
         std::cerr
@@ -237,8 +241,8 @@ void OpenHurricane::HurMPIBase::error(const std::string &ErrorMsg, const std::st
 #endif // MPI_PARALLEL
 }
 
-void OpenHurricane::HurMPIBase::warning(const std::string& WarningMsg,
-    const std::string& FunctionName) {
+void OpenHurricane::HurMPIBase::warning(const std::string &WarningMsg,
+                                        const std::string &FunctionName) {
 #ifdef MPI_PARALLEL
     if (isInitialized_) {
         bool isCollective = isCollectiveCall(1.0);
@@ -273,7 +277,7 @@ void OpenHurricane::HurMPIBase::warning(const std::string& WarningMsg,
             std::cerr << std::endl << std::endl;
         }
     }
-#else // Not define MPI_PARALLEL
+#else  // Not define MPI_PARALLEL
     if (procRank_ == 0) {
         std::cerr << std::endl << std::endl;
         std::cerr << "Waring in \"" << FunctionName.c_str() << "\": " << std::endl;
@@ -313,7 +317,7 @@ hur_nodiscard bool OpenHurricane::HurMPIBase::isCollectiveCall(double _times) {
         return true;
     }
     return false;
-#else // Not define MPI_PARALLEL
+#else  // Not define MPI_PARALLEL
     return true;
 #endif // MPI_PARALLEL
 }
@@ -350,7 +354,7 @@ void OpenHurricane::HurMPIBase::setThreads(const bool haveThreads) {
     haveThreads_ = haveThreads;
 }
 
-int OpenHurricane::HurMPIBase::init(int* argc, char*** argv) {
+int OpenHurricane::HurMPIBase::init(int *argc, char ***argv) {
     isInitialized_ = true;
 #ifdef MPI_PARALLEL
     int provided_thread_support = 0;
@@ -821,7 +825,7 @@ void OpenHurricane::HurMPIBase::bcastString(std::string &bufStr, int root, Comm 
 
     char *bufC = new char[sizeBuf + 1]();
 
-    if (!bufStr.empty() && sizeBuf <= bufStr.size()) {
+    if (!bufStr.empty() && sizeBuf <= (int)bufStr.size()) {
         strcpy(bufC, bufStr.c_str());
     }
     bufC[sizeBuf] = '\0';
@@ -831,8 +835,8 @@ void OpenHurricane::HurMPIBase::bcastString(std::string &bufStr, int root, Comm 
 #endif // MPI_PARALLEL
 }
 
-void OpenHurricane::HurMPIBase::bcastString(std::string &bufStr, int root,const subCommtor& comm) {
-#ifdef MPI_PARALLEL 
+void OpenHurricane::HurMPIBase::bcastString(std::string &bufStr, int root, const subCommtor &comm) {
+#ifdef MPI_PARALLEL
     if (!parRun()) {
         return;
     }
@@ -847,7 +851,7 @@ void OpenHurricane::HurMPIBase::bcastString(std::string &bufStr, int root,const 
 
     char *bufC = new char[sizeBuf + 1]();
 
-    if (!bufStr.empty() && sizeBuf <= bufStr.size()) {
+    if (!bufStr.empty() && sizeBuf <= (int)bufStr.size()) {
         strcpy(bufC, bufStr.c_str());
     }
     bufC[sizeBuf] = '\0';
@@ -904,7 +908,8 @@ void OpenHurricane::HurMPIBase::gatherString(std::string &bufStr, int root, Comm
 #endif // MPI_PARALLEL
 }
 
-void OpenHurricane::HurMPIBase::gatherString(std::string &bufStr, int root, const subCommtor &comm) {
+void OpenHurricane::HurMPIBase::gatherString(std::string &bufStr, int root,
+                                             const subCommtor &comm) {
 #ifdef MPI_PARALLEL
     if (!parRun()) {
         return;

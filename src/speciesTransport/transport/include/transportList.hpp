@@ -36,7 +36,6 @@ namespace OpenHurricane {
     /*!\brief The class of transport properties list.*/
     class transportList {
     private:
-
         /*!\brief Hold const-reference to the list of species.*/
         const speciesList &species_;
 
@@ -54,7 +53,6 @@ namespace OpenHurricane {
         hur_nodiscard const realSquareMatrix &WiWj() const;
 
     public:
-
         transportList();
 
         /*!\brief Construct from components.*/
@@ -70,8 +68,7 @@ namespace OpenHurricane {
         transportList(transportList &&) noexcept;
 
         /*!\brief Destructor.*/
-        ~transportList() noexcept;
-
+        virtual ~transportList() noexcept;
 
         /*!\brief Return the table of species.*/
         hur_nodiscard inline const speciesList &species() const noexcept { return species_; }

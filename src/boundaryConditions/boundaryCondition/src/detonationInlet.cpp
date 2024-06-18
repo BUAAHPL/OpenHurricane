@@ -50,7 +50,7 @@ void OpenHurricane::detonationInlet::getValue(real &value, const std::string &na
 OpenHurricane::detonationInlet::detonationInlet(const faceZone &fZ,
                                                 geometryArray<vector, cellMesh> &gf,
                                                 const controller &cont)
-    : Base(fZ, gf, cont), directionType_(normalToBoundary) {
+    : Base(fZ, gf, cont), directionType_(normalToBoundary), inletType_() {
     Base::setSpecified();
     getValue(Pt_, std::string("totalPressure"), cont);
 
@@ -114,6 +114,10 @@ void OpenHurricane::detonationInlet::updateBoundary() {
     const real Pcr = Pt_ / pow(1 + 0.5 * (gin - 1) * sqr(Ma), gin / (gin - 1));
     const real Rg = thTable.species().Rm(yiBnd_);
 
+    if (inletType_.size() != boundaryZone_.size()) {
+        inletType_.resize(boundaryZone_.size());
+    }
+
     for (integer fi = boundaryZone_.firstIndex(); fi < boundaryZone_.lastIndex() + 1; fi++) {
         const integer celli = fL[fi].leftCell();
         const integer ghostId = fL[fi].rightCell();
@@ -124,8 +128,25 @@ void OpenHurricane::detonationInlet::updateBoundary() {
             pi0 = p.lastArray()[celli];
         }
 
-        if (pi0 >= Pt_) {
-            vbnd = Zero;           
+        auto id = fi - boundaryZone_.firstIndex();
+        if (subCstep <= 1) {
+            if (pi0 >= Pt_) {
+                inletType_[id] = inletStateType::blocking;
+            } else {
+                inletType_[id] = inletStateType::supersonic;
+            }
+        }
+
+        if (inletType_[id] != inletStateType::blocking) {
+            if (Pcr < pi0 && pi0 < Pt_) {
+                inletType_[id] = inletStateType::subsonic;
+            } else {
+                inletType_[id] = inletStateType::supersonic;
+            }
+        }
+
+        if (inletType_[id] == inletStateType::blocking) {
+            vbnd = Zero;
 
             pbnd = p[celli];
             Tbnd = T[celli];
@@ -137,15 +158,17 @@ void OpenHurricane::detonationInlet::updateBoundary() {
         }
 
         else {
-            if (Pcr < pi0 && pi0 < Pt_) {
+            real vv = 0;
+            if (inletType_[id] == inletStateType::subsonic) {
                 pbnd = pi0;
+                vv =
+                    sqrt(2.0 * gin / (gin - 1) * Rg * Tt_ * (1 - pow(pbnd / Pt_, (gin - 1) / gin)));
             } else {
                 pbnd = Pcr;
+                vv = sqrt(2.0 * gin / (gin + 1) * Rg * Tt_);
             }
             Tbnd = Tt_ * pow(pbnd / Pt_, (gin - 1) / gin);
-            real vv =
-                sqrt(2.0 * gin / (gin - 1) * Rg * Tt_ * (1 - pow(pbnd / Pt_, (gin - 1) / gin)));
-
+           
             if (directionType_ == normalToBoundary) {
                 vbnd = vv * normal;
             } else {

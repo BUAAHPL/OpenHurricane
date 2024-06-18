@@ -80,7 +80,7 @@ namespace OpenHurricane {
         inline Matrix(const integer m, const integer n) : Base(), nRows_(m), nColumns_(n) {
 #ifdef HUR_DEBUG
             if (m < 0 || n < 0) {
-                LFatal("invalid size");
+                LFatal("invalid size: m = %d, n = %d", m, n);
             }
 #endif // HUR_DEBUG
             allocate();
@@ -93,7 +93,7 @@ namespace OpenHurricane {
             : Base(), nRows_(m), nColumns_(n) {
 #ifdef HUR_DEBUG
             if (m < 0 || n < 0) {
-                LFatal("invalid size");
+                LFatal("invalid size: m = %d, n = %d", m, n);
             }
 #endif // HUR_DEBUG
             allocate();
@@ -107,7 +107,7 @@ namespace OpenHurricane {
             : Base(), nRows_(m), nColumns_(n) {
 #ifdef HUR_DEBUG
             if (m < 0 || n < 0) {
-                LFatal("invalid size");
+                LFatal("invalid size: m = %d, n = %d", m, n);
             }
 #endif // HUR_DEBUG
             allocate();

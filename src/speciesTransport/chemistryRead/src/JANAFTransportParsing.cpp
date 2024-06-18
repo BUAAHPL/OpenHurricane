@@ -137,6 +137,7 @@ OpenHurricane::JANAFTransportParsing::JANAFTransportParsing(const std::string &t
         if (exclPos != std::string::npos) {
             transportFileList_[i].erase(exclPos);
         }
+        replaceAllMarks(transportFileList_[i], "\t", " ");
     }
 }
 
@@ -155,7 +156,7 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
             stdStringList tranlineEle;
             split(tranline, tranlineEle, " ");
             if (tranlineEle.size() < 7) {
-                PLWarning("The format of transport line: %s is wrong in transport file parsing\n",
+                PLWarning("    The format of transport line: %s is wrong in transport file parsing",
                           transportFileList_[i].c_str());
             }
             string speciesName = extractSpeciesName(tranlineEle[0] + " ");
@@ -166,7 +167,31 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
                     if (speciesFlag_[j] > 1) {
                         break;
                     }
-                    replaceAllMarks(tranline, speciesName, "");
+                    integer moleculeIndex = 0;
+                    if (tranlineEle.size() >= 2) {
+                        readInteger(tranlineEle[1], moleculeIndex);
+                    }
+                    real potentialWellDepth = 1.0;
+                    if (tranlineEle.size() >= 3) {
+                        readReal(tranlineEle[2], potentialWellDepth);
+                    }
+                    real collisionDiameter = 1.0;
+                    if (tranlineEle.size() >= 4) {
+                        readReal(tranlineEle[3], collisionDiameter);
+                    }
+                    real dipoleMoment = 0;
+                    if (tranlineEle.size() >= 5) {
+                        readReal(tranlineEle[4], dipoleMoment);
+                    }
+                    real polarizability = 0;
+                    if (tranlineEle.size() >= 6) {
+                        readReal(tranlineEle[5], polarizability);
+                    }
+                    real rotRelaxtionNumber = 0;
+                    if (tranlineEle.size() >= 7) {
+                        readReal(tranlineEle[6], rotRelaxtionNumber);
+                    }
+                    /*replaceAllMarks(tranline, speciesName, "");
                     std::stringstream ss(tranline);
                     integer moleculeIndex;
                     real potentialWellDepth;
@@ -182,7 +207,7 @@ void OpenHurricane::JANAFTransportParsing::parsing(transportList &trT, const rea
                     ss >> moleculeIndex >> potentialWellDepth >> collisionDiameter >>
                         dipoleMoment >> polarizability >> rotRelaxtionNumber;
 
-                    ss.precision(defpre);
+                    ss.precision(defpre);*/
 
                     auto tranPtr = trT.tranTable().set(
                         j, new kineticTheory(trT.species(), j, Prl, moleculeIndex,

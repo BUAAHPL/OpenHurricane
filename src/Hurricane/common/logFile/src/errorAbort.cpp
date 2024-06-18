@@ -92,7 +92,7 @@ void OpenHurricane::printPLogWarning(char const *const errMsg, char const *const
 #endif // HUR_DEBUG
     HurMPIBase::warning(errMsg, functionName);
 #elif defined(HUR_LESS_LOGGER)
-    Pout("%s in function: %s", errMsg, func);
+    Pout("%s in function: %s\n", errMsg, func);
 #else
     Pout("%s\n", errMsg);
 #endif // HUR_FULL_LOGGER
