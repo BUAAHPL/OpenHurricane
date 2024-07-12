@@ -166,16 +166,19 @@ void OpenHurricane::forceMonitors::writeAndPrintReal() const {
 }
 
 void OpenHurricane::forceMonitors::writeAndPrint(const integer step) const {
-    if (iter().hasSubIteration()) {
+   /* if (iter().hasSubIteration()) {
         if ((iter().subIter().isLooping() && !iter().subIter().isResConvergence()) ||
             iter().subIter().checkMin()) {
             return;
         }
-    }
+    }*/
     auto &fos = const_cast<fileOsstream &>(fosResidual_);
     if (HurMPI::master()) {
         if (writeToFile_) {
             fos.os() << step;
+            if (iter().hasPhysicalTimeStep()) {
+                fos.os() << '\t' << toString(iter().pTStep().totalTime()).c_str();
+            }
         }
     }
     writeAndPrintReal();
@@ -219,7 +222,8 @@ void OpenHurricane::forceMonitors::monitoring() const {
 }
 
 void OpenHurricane::forceMonitors::subMonitoring() const {
-    if (iter().subIter().cSubStep() % updateStep_ == 0) {
+    // should not monitor in the sub-iteration
+    /*if (iter().subIter().cSubStep() % updateStep_ == 0) {
         writeAndPrint(iter().subIter().totalStep());
-    }
+    }*/
 }

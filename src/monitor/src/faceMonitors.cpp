@@ -239,6 +239,9 @@ void OpenHurricane::faceMonitors::writeAndPrint(const integer step) const {
     if (HurMPI::master()) {
         if (writeToFile_) {
             fos.os() << step;
+            if (iter().hasPhysicalTimeStep()) {
+                fos.os() << '\t' << toString(iter().pTStep().totalTime()).c_str();
+            }
         }
     }
 
@@ -328,7 +331,8 @@ void OpenHurricane::faceMonitors::monitoring() const {
 }
 
 void OpenHurricane::faceMonitors::subMonitoring() const {
-    if (iter().subIter().cSubStep() % updateStep_ == 0) {
+    // should not monitor in the sub-iteration
+    /*if (iter().subIter().cSubStep() % updateStep_ == 0) {
         writeAndPrint(iter().subIter().totalStep());
-    }
+    }*/
 }
