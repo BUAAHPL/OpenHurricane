@@ -131,7 +131,7 @@ If you have any problems in building or running the code or any suggestions, ple
 
  * **Ph.D Rao Sihang**. Email:<raosihang@hotmail.com>
  * **[A.P. Chen Bing](http://shi.buaa.edu.cn/chenbing/zh_CN/index.htm "A.P. Chen Bing")**. Email:<MarkChien@buaa.edu.cn>
- * **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")**. Email:<xuxu_1521@126.com>
+ * **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")**. Email:<xuxu@buaa.edu.cn>
 
 ## Current Maintainer
 
