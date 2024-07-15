@@ -125,24 +125,24 @@ Thanks for building, and happy optimizing!
 
 ## OpenHurricane DEVELOPERS
 
-The current OpenHurricane project was developed by **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** research group at ***Beihang University***.
+The current OpenHurricane project was developed by **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** research group at ***Beihang University***.
 
 If you have any problems in building or running the code or any suggestions, please do not hesitate to contact.
 
  * **Ph.D Rao Sihang**. Email:<raosihang@hotmail.com>
  * **[A.P. Chen Bing](http://shi.buaa.edu.cn/chenbing/zh_CN/index.htm "A.P. Chen Bing")**. Email:<MarkChien@buaa.edu.cn>
- * **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")**. Email:<xuxu_1521@126.com>
+ * **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")**. Email:<xuxu_1521@126.com>
 
 ## Current Maintainer
 
 The OpenHurricane project is maintained by  
 
-* **Ph.D Rao Sihang** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:raosihang@hotmail.com
-* **Ph.D Candidates Peng Jian** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:p308224999@outlook.com
-* **Ph.D Candidates Yang Hongzhen** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:826134437@qq.com
-* **Ph.D Candidates Zhang Jiebo** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
-* **Zheng Putian** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
-* **Qin Xu** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/zh_CN/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+* **Ph.D Rao Sihang** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:raosihang@hotmail.com
+* **Ph.D Candidates Peng Jian** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:p308224999@outlook.com
+* **Ph.D Candidates Yang Hongzhen** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***. Email:826134437@qq.com
+* **Ph.D Candidates Zhang Jiebo** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+* **Zheng Putian** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
+* **Qin Xu** of **[Prof. Xu Xu](https://shi.buaa.edu.cn/xuxu/en/index.htm "Prof. Xu Xu")'s** group at ***Beihang University***.
 
 
 ## License
