@@ -1,5 +1,5 @@
 ﻿/*!
- * \file HurricaneMain.cpp
+ * \file OpenHurricaneMain.cpp
  * \brief Main subroutines for OpenHurricane main program.
  * \author Rao Sihang
  * \version V2.0.0
@@ -27,7 +27,7 @@
  *
  */
 
-#include "HurricaneMain.hpp"
+#include "OpenHurricaneMain.hpp"
 #include "clock.hpp"
 
 using namespace OpenHurricane;

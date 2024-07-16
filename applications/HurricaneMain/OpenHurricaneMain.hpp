@@ -1,7 +1,7 @@
 ﻿/*!
- * \file HurricaneMain.hpp
- * \brief Headers of the main subroutines of the unstructre CFD code.
- *        The subroutines and functions are in the <i>HurricaneMain.cpp</i> file.
+ * \file OpenHurricaneMain.hpp
+ * \brief Headers of the main subroutines of the OpenHurricane CFD code.
+ *        The subroutines and functions are in the <i>OpenHurricaneMain.cpp</i> file.
  * \author Rao Sihang
  * \version V2.0.0
  * \date 2022.05.02
