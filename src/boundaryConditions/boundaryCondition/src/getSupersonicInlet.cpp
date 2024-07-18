@@ -33,11 +33,11 @@ void OpenHurricane::getBoundariesFromController::getSupersonicInlet(const mixtur
                                                                     const controller &cont,
                                                                     controller &bcCont,
                                                                     const faceZone &fz) {
-    bcCont.add(std::string("defultType"), string("fixedValue"));
-    bcCont.add(std::string("vbcType"), string("fixedValue"));
-    bcCont.add(std::string("rhobcType"), string("fixedValue"));
-    bcCont.add(std::string("pbcType"), string("fixedValue"));
-    bcCont.add(std::string("TbcType"), string("fixedValue"));
+    bcCont.add(std::string("defultType"), string("fixedValueZeroGradient"));
+    bcCont.add(std::string("vbcType"), string("fixedValueZeroGradient"));
+    bcCont.add(std::string("rhobcType"), string("fixedValueZeroGradient"));
+    bcCont.add(std::string("pbcType"), string("fixedValueZeroGradient"));
+    bcCont.add(std::string("TbcType"), string("fixedValueZeroGradient"));
     auto yi = getSpeciesMassFractions(bcCont, mixtures, true);
     vector direct;
     const auto directTypeW =

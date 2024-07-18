@@ -91,17 +91,40 @@ void OpenHurricane::gradient::updateBoundaryField(geometryArray<tensor, cellMesh
     const auto &fS = mesh.faceArea();
     tensorTransfer myTransfer(mesh, grad, false, true);
     myTransfer.transferInit();
+
+    tensor nfnf;
+    tensor HousHolder;
+
     for (integer fZI = 0; fZI < fZ.size(); ++fZI) {
         if (fZ[fZI].isInterior()) {
             continue;
         } else if (fZ[fZI].isSymmetric()) {
+            //for (integer fI = fZ[fZI].firstIndex(); fI <= fZ[fZI].lastIndex(); ++fI) {
+            //    const auto &cl = fL[fI].leftCell();
+            //    const auto &cr = fL[fI].rightCell();
+
+            //    const vector n = fS[fI].normalized();
+
+            //    grad[cr] = grad[cl] - (real(2.0) * (grad[cl] * n) & n);
+            //}
+
             for (integer fI = fZ[fZI].firstIndex(); fI <= fZ[fZI].lastIndex(); ++fI) {
                 const auto &cl = fL[fI].leftCell();
                 const auto &cr = fL[fI].rightCell();
 
                 const vector n = fS[fI].normalized();
 
-                grad[cr] = grad[cl] - (real(2.0) * (grad[cl] * n) & n);
+                /*grad[cr] = grad[cl] - (real(2.0) * (grad[cl] * n) & n);*/
+
+                for (integer i = 0; i < 3; i++) {
+                    for (integer j = 0; j < 3; j++) {
+                        nfnf(i,j) = n[i] * n[j];
+                    }
+                }
+
+                HousHolder = I - real(2) * nfnf;
+
+                grad[cr] = HousHolder * grad[cl] * HousHolder;
             }
         } else if (fZ[fZI].isCutFace()) {
             continue;
