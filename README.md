@@ -13,7 +13,7 @@ There also exists an example in the "examples" folder which is about how the fun
 
 ## How to Cite
 
-Cite Hurricane by the following format : 
+Cite OpenHurricane by the following format : 
 Rao S, Chen B, Xu X. Heterogeneous CPU-GPU parallelization for modeling supersonic reacting flows with detailed chemical kinetics[J]. Computer Physics Communications, 2024, 300: 109188.
 
 Access this article by DOI:10.1016/j.cpc.2024.109188.
