@@ -1,4 +1,4 @@
-﻿# OpenHurricane
+# OpenHurricane
 
 *Open parts of Hurricane project*
 
@@ -11,6 +11,12 @@ OpenHurricane is in its development phase, and there would be more features in i
 OpenHurricane is built using a typical ```camke/make/make install``` process. When make install is complete, the built library will be installed in the "lib" folder.
 There also exists an example in the "examples" folder which is about how the functions of the library are called.
 
+## How to Cite
+
+Cite Hurricane by the following format : 
+Rao S, Chen B, Xu X. Heterogeneous CPU-GPU parallelization for modeling supersonic reacting flows with detailed chemical kinetics[J]. Computer Physics Communications, 2024, 300: 109188.
+
+Access this article by DOI:10.1016/j.cpc.2024.109188.
 
 ## Build
 
